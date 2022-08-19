@@ -13,9 +13,11 @@ def communicate(process, input):
     process.stdin.flush()
     print('LOG: wrote input')
     line = process.stdout.readline()
+    if not line:
+        return ''
     print('LOG: read output')
     return line
 
 p = run_executer()
-while True:
+while p.poll() is None:
     print(communicate(p, input()), end='')
