@@ -1,12 +1,12 @@
 import script
-
 import sys
+from logger import LogLevel, LOG
 
 def run():
-    print('LOG: run', file=sys.stderr)
+    LOG(LogLevel.INFO, 'executer has been started')
     while True:
         command = input()
-        print('LOG: read input', file=sys.stderr)
+        LOG(LogLevel.INFO, 'executer has read input')
         if command == 'getArray':
             print(script.getArray(3))
         elif command == 'getMap':
