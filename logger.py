@@ -1,6 +1,16 @@
 import enum
 import sys
 
+_is_logging_enabled = True
+
+
+def ENABLE_LOGGING():
+  _is_logging_enabled = True
+
+
+def DISABLE_LOGGING():
+  _is_logging_enabled = False
+
 
 class LogLevel(enum.Enum):
   INFO = 1
@@ -9,6 +19,8 @@ class LogLevel(enum.Enum):
 
 
 def LOG(log_level, message):
+  if not _is_logging_enabled:
+    return
   actual_message = ''
   if log_level == LogLevel.INFO:
     actual_message += 'INFO: '
