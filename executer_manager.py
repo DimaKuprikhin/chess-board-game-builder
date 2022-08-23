@@ -14,7 +14,7 @@ class ExecuterManager:
           LogLevel.ERROR, 'there is already an executer with id ' + executer_id
       )
       return
-    script = 'from executer import Executer; e = Executer(); e.run()'
+    script = 'import sys; from executer import Executer; Executer().run(sys.stdin)'
     self.executers[executer_id] = sp.Popen([sys.executable, '-c', script],
                                            stdin=sp.PIPE,
                                            stdout=sp.PIPE,
@@ -28,7 +28,7 @@ class ExecuterManager:
     executer = self.executers[executer_id]
     response = ''
     try:
-      executer.stdin.write(input + '\n')
+      executer.stdin.write(input)
       executer.stdin.flush()
       response = executer.stdout.readline()
     except:
