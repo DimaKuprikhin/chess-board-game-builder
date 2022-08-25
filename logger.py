@@ -5,10 +5,12 @@ _is_logging_enabled = True
 
 
 def ENABLE_LOGGING():
+  global _is_logging_enabled
   _is_logging_enabled = True
 
 
 def DISABLE_LOGGING():
+  global _is_logging_enabled
   _is_logging_enabled = False
 
 
