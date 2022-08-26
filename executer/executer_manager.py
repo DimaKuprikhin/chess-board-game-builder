@@ -1,6 +1,6 @@
 import subprocess as sp
 import sys
-from logger import LogLevel, LOG
+from common.logger import LogLevel, LOG
 
 
 class ExecuterManager:
@@ -14,7 +14,7 @@ class ExecuterManager:
           LogLevel.ERROR, 'there is already an executer with id ' + executer_id
       )
       return
-    script = 'import sys; from executer import Executer; Executer().run(sys.stdin)'
+    script = 'import sys; from executer.executer import Executer; Executer().run(sys.stdin)'
     self.executers[executer_id] = sp.Popen([sys.executable, '-c', script],
                                            stdin=sp.PIPE,
                                            stdout=sp.PIPE,
