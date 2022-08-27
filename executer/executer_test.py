@@ -1,4 +1,5 @@
 from executer.executer import Executer
+from executer.executer_utils import serialize_function_call, deserialize_function_result
 
 
 class FakeInputIter:
@@ -21,4 +22,4 @@ class TestExecuter:
     Executer().run(FakeInputIter([]))
 
   def test_run_input(self):
-    Executer().run(FakeInputIter(['getArray', 'getMap']))
+    Executer().run(FakeInputIter([serialize_function_call('getArray', [3])]))

@@ -1,5 +1,5 @@
-from executer_manager import ExecuterManager
-from logger import LogLevel, LOG
+from executer.executer_manager import ExecuterManager
+from common.logger import LogLevel, LOG
 import sys
 
 
@@ -21,7 +21,7 @@ def main():
       cur_executer = _next_id(cur_executer, total_executers)
     LOG(
         LogLevel.INFO, 'executer ' + str(cur_executer) + ': '
-        + manager.communicate(cur_executer, line)
+        + str(manager.communicate(cur_executer, line.strip(), []))
     )
     cur_executer = _next_id(cur_executer, total_executers)
     if not manager.is_any_alive():

@@ -1,13 +1,13 @@
-def getArray(length):
+def getArray(length=3):
   result = []
   for i in range(length):
     result.append(i)
   return result
 
 
-def getMap(key, value):
+def getMap(key='key', value='value'):
   return { "key": "value"}
 
 
-def getSquare(number):
+def getSquare(number=7):
   return number * number

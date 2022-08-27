@@ -1,6 +1,7 @@
 import subprocess as sp
 import sys
 from common.logger import LogLevel, LOG
+from executer.executer_utils import serialize_function_call, deserialize_function_result
 
 
 class ExecuterManager:
@@ -21,23 +22,25 @@ class ExecuterManager:
                                            universal_newlines=True)
     self.running_count += 1
 
-  def communicate(self, executer_id, input):
+  def communicate(self, executer_id, function, args):
     if executer_id not in self.executers:
       LOG(LogLevel.ERROR, 'there is no executer with id ' + executer_id)
       return ''
+
     executer = self.executers[executer_id]
-    response = ''
+    request = serialize_function_call(function, args)
+    response = None
     try:
-      executer.stdin.write(input)
+      executer.stdin.write(request + '\n')
       executer.stdin.flush()
-      response = executer.stdout.readline()
+      response = executer.stdout.readline().strip()
     except:
-      self.running_count -= 1
+      pass
     if not response:
       LOG(LogLevel.INFO, 'executer ' + str(executer_id) + ' has finished work')
       self.running_count -= 1
       return ''
-    return response
+    return deserialize_function_result(response)
 
   def is_alive(self, executer_id):
     if executer_id not in self.executers:
