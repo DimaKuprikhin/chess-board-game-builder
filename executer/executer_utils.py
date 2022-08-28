@@ -1,6 +1,5 @@
 import json
 from typing import Any, Tuple
-from urllib import request
 
 
 def _check_type(obj, type):
