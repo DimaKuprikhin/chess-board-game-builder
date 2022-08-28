@@ -1,7 +1,8 @@
 import subprocess as sp
 import sys
+from typing import Any, Tuple
 from common.logger import LogLevel, LOG
-from executer.executer_utils import serialize_function_call, deserialize_function_result
+from executer import executer_utils
 
 
 class ExecuterManager:
@@ -14,7 +15,7 @@ class ExecuterManager:
     self.executers = {}
     self.running_count = 0
 
-  def create_executer(self, executer_id):
+  def create_executer(self, executer_id: str):
     '''
     Creates a new process with Executer class instance running an endless
     loop for receiving requests and sending responces through IPC using json
@@ -33,17 +34,22 @@ class ExecuterManager:
                                            universal_newlines=True)
     self.running_count += 1
 
-  def communicate(self, executer_id, function, args):
+  def call_script_function(
+      self, executer_id: str, module_name: str, function: str, args: list
+  ) -> Tuple[bool, Any]:
     '''
-    Sends a request to executer to call a certain function with given
-    arguments. Returns a return value from this function.
+    Sends request to executer to call a certain function from a certain module with the given
+    arguments. Returns status of the call and result.
     '''
     if executer_id not in self.executers:
       LOG(LogLevel.ERROR, 'there is no executer with id ' + executer_id)
-      return ''
+      return None
 
     executer = self.executers[executer_id]
-    request = serialize_function_call(function, args)
+    request_data = executer_utils.serialize_call_function_request(
+        module_name, function, args
+    )
+    request = executer_utils.serialize_request('call_function', request_data)
     response = None
     # Executer process may no longer exist, so we need to handle possible
     # exceptions.
@@ -54,15 +60,14 @@ class ExecuterManager:
     except:
       pass
     if not response:
-      LOG(LogLevel.INFO, 'executer ' + str(executer_id) + ' has finished work')
       self.running_count -= 1
-      return ''
-    return deserialize_function_result(response)
+      return None
+    return executer_utils.deserialize_response(response)
 
-  def is_alive(self, executer_id):
+  def is_alive(self, executer_id: str) -> bool:
     if executer_id not in self.executers:
       return False
     return self.executers[executer_id].poll() is None
 
-  def is_any_alive(self):
+  def is_any_alive(self) -> bool:
     return self.running_count > 0

@@ -6,7 +6,7 @@ def getArray(length=3):
 
 
 def getMap(key='key', value='value'):
-  return { "key": "value"}
+  return { key: value }
 
 
 def getSquare(number=7):

@@ -32,21 +32,24 @@ class TestExecuter:
   def test_empty_run(self):
     Executer().run(FakeInputIter([]), FakeOutput())
 
-  def test_load_script(self):
-    request_data = serialize_load_script_request('script', 'executer.script')
-    request = serialize_request('load_script', request_data)
-    output = FakeOutput()
-    Executer().run(FakeInputIter([request]), output)
-    assert output.get_data() == '{"status": true, "result": "OK"}\n'
-
   def test_call_function(self):
-    request_data = serialize_load_script_request('script', 'executer.script')
-    request = serialize_request('load_script', request_data)
-    requests = [request]
-    request_data = serialize_call_function_request('script', 'getArray', [3])
-    request = serialize_request('call_function', request_data)
-    requests.append(request)
+    requests = []
+    request_data = serialize_call_function_request(
+        'executer.script', 'getArray', [4]
+    )
+    requests.append(serialize_request('call_function', request_data))
+    request_data = serialize_call_function_request(
+        'executer.script', 'getMap', ['key', 123]
+    )
+    requests.append(serialize_request('call_function', request_data))
+    request_data = serialize_call_function_request(
+        'executer.script', 'getSquare', [6]
+    )
+    requests.append(serialize_request('call_function', request_data))
 
     output = FakeOutput()
     Executer().run(FakeInputIter(requests), output)
-    assert output.get_data() == '{"status": true, "result": "OK"}\n{"status": true, "result": [0, 1, 2]}\n'
+    expected_output = '{"status": true, "result": [0, 1, 2, 3]}\n'
+    expected_output += '{"status": true, "result": {"key": 123}}\n'
+    expected_output += '{"status": true, "result": 36}\n'
+    assert output.get_data() == expected_output
