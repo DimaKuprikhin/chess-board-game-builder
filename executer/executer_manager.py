@@ -5,16 +5,27 @@ from executer.executer_utils import serialize_function_call, deserialize_functio
 
 
 class ExecuterManager:
+  '''
+  Used to handle executer processes with Executer class instances in them.
+  Provides API for creating executer processes and inter-process
+  communication with them to load and execute user scripts.
+  '''
   def __init__(self):
     self.executers = {}
     self.running_count = 0
 
   def create_executer(self, executer_id):
+    '''
+    Creates a new process with Executer class instance running an endless
+    loop for receiving requests and sending responces through IPC using json
+    format.
+    '''
     if executer_id in self.executers:
       LOG(
           LogLevel.ERROR, 'there is already an executer with id ' + executer_id
       )
       return
+
     script = 'import sys; from executer.executer import Executer; Executer().run(sys.stdin)'
     self.executers[executer_id] = sp.Popen([sys.executable, '-c', script],
                                            stdin=sp.PIPE,
@@ -23,6 +34,10 @@ class ExecuterManager:
     self.running_count += 1
 
   def communicate(self, executer_id, function, args):
+    '''
+    Sends a request to executer to call a certain function with given
+    arguments. Returns a return value from this function.
+    '''
     if executer_id not in self.executers:
       LOG(LogLevel.ERROR, 'there is no executer with id ' + executer_id)
       return ''
@@ -30,6 +45,8 @@ class ExecuterManager:
     executer = self.executers[executer_id]
     request = serialize_function_call(function, args)
     response = None
+    # Executer process may no longer exist, so we need to handle possible
+    # exceptions.
     try:
       executer.stdin.write(request + '\n')
       executer.stdin.flush()
