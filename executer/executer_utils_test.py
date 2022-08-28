@@ -90,9 +90,11 @@ class TestExecuterUtils:
     self._serialize_response_helper(False, 'function result')
     self._serialize_response_helper(True, ['func', 'result'])
     self._serialize_response_helper(False, 5)
-    self._serialize_response_helper(True, {
-        'result': 123,
-        'is_valid': [False, False, True]
-    })
+    self._serialize_response_helper(
+        True, {
+            'result': 123,
+            'is_valid': [False, False, True]
+        }
+    )
     with pytest.raises(TypeError):
       self._serialize_response_helper('OK', 'result')
