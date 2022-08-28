@@ -26,7 +26,7 @@ class ExecuterManager:
       )
       return
 
-    script = 'import sys; from executer.executer import Executer; Executer().run(sys.stdin)'
+    script = 'import sys; from executer.executer import Executer; Executer().run(sys.stdin, sys.stdout)'
     self.executers[executer_id] = sp.Popen([sys.executable, '-c', script],
                                            stdin=sp.PIPE,
                                            stdout=sp.PIPE,

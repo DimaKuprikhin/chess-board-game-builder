@@ -1,5 +1,4 @@
 import importlib
-import sys
 from common.logger import LogLevel, LOG
 from executer import executer_utils
 
@@ -62,7 +61,7 @@ class Executer:
     else:
       return False, 'Unknown request type'
 
-  def run(self, input_iter):
+  def run(self, input_iter, output):
     '''
     Runs an infinite loop in which Executer receives requests from the
     ExecuterManager from the main process and sends responces.
@@ -73,6 +72,4 @@ class Executer:
       LOG(LogLevel.INFO, 'executer has read input ' + request)
       status, result = self._handle_request(request)
       response = executer_utils.serialize_response(status, result)
-      sys.stdout.write(response + '\n')
-      # There is no need to flush, but we do it just in case.
-      sys.stdout.flush()
+      output.write(response + '\n')
