@@ -1,5 +1,5 @@
 from executer.executer import Executer
-from executer.executer_utils import serialize_function_call, deserialize_function_result
+from executer.executer_utils import *
 
 
 class FakeInputIter:
@@ -17,9 +17,86 @@ class FakeInputIter:
     raise StopIteration
 
 
+class FakeOutput:
+  def __init__(self):
+    self.data = ''
+
+  def write(self, data: str):
+    self.data += data
+
+  def get_data(self) -> str:
+    return self.data
+
+
+def _serialize_function_call_request_helper(
+    module_name: str, function: str, args: list, timeout: float
+) -> str:
+  request_data = serialize_call_function_request(
+      module_name, function, args, timeout
+  )
+  return serialize_request('call_function', request_data)
+
+
 class TestExecuter:
   def test_empty_run(self):
-    Executer().run(FakeInputIter([]))
+    Executer().run(FakeInputIter([]), FakeOutput())
 
-  def test_run_input(self):
-    Executer().run(FakeInputIter([serialize_function_call('getArray', [3])]))
+  def test_call_function(self):
+    module = 'test_data.script'
+    requests = [
+        _serialize_function_call_request_helper(module, 'getArray', [4], 0.0),
+        _serialize_function_call_request_helper(
+            module, 'getMap', ['key', 123], 0.0
+        ),
+        _serialize_function_call_request_helper(module, 'getSquare', [6], 0.0)
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": true, "result": [0, 1, 2, 3]}\n'
+    expected_output += '{"status": true, "result": {"key": 123}}\n'
+    expected_output += '{"status": true, "result": 36}\n'
+    assert output.get_data() == expected_output
+
+  def test_missing_module(self):
+    module = 'test_data.missing_scirpt'
+    requests = [
+        _serialize_function_call_request_helper(module, 'func', [], 0.0)
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Module not found"}\n'
+    assert output.get_data() == expected_output
+
+  def test_missing_function(self):
+    module = 'test_data.script'
+    requests = [
+        _serialize_function_call_request_helper(
+            module, 'missing_func', [], 0.0
+        )
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Function not found"}\n'
+    assert output.get_data() == expected_output
+
+  def test_wrong_arguments(self):
+    module = 'test_data.script'
+    requests = [
+        _serialize_function_call_request_helper(
+            module, 'getArray', [1, 2], 0.0
+        )
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Wrong arguments"}\n'
+    assert output.get_data() == expected_output
+
+    requests = [
+        _serialize_function_call_request_helper(
+            module, 'getArray', ['1'], 0.0
+        )
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Wrong arguments"}\n'
+    assert output.get_data() == expected_output
