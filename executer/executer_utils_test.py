@@ -4,15 +4,18 @@ import pytest
 
 class TestExecuterUtils:
   def _serialize_call_function_request_helper(
-      self, module_name, function, args
+      self, module_name, function, args, timeout
   ):
-    serialized = serialize_call_function_request(module_name, function, args)
-    module_name_, function_, args_ = deserialize_call_function_request(
+    serialized = serialize_call_function_request(
+        module_name, function, args, timeout
+    )
+    module_name_, function_, args_, timeout_ = deserialize_call_function_request(
         serialized
     )
     assert module_name_ == module_name
     assert function_ == function
     assert args_ == args
+    assert timeout_ == timeout
 
   def _serialize_request_helper(self, type, data):
     serialized = serialize_request(type, data)
@@ -27,30 +30,34 @@ class TestExecuterUtils:
     assert response_ == response
 
   def test_serialize_call_function_request(self):
-    self._serialize_call_function_request_helper('', '', [])
+    self._serialize_call_function_request_helper('', '', [], 0.0)
     self._serialize_call_function_request_helper(
-        'module_name', 'func tion', []
+        'module_name', 'func tion', [], 0.005
     )
     self._serialize_call_function_request_helper(
         '3', '', ['str', 3, [{
             'a': 12
-        }, True]]
+        }, True]], 1.0
     )
     self._serialize_call_function_request_helper(
-        'another module', '.function()', ['hello world ', False]
+        'another module', '.function()', ['hello world ', False], 0.1
     )
     with pytest.raises(TypeError):
-      self._serialize_call_function_request_helper([], '5', [])
+      self._serialize_call_function_request_helper([], '5', [], 0.0)
     with pytest.raises(TypeError):
-      self._serialize_call_function_request_helper('module', 5, [])
+      self._serialize_call_function_request_helper('module', 5, [], 0.0)
     with pytest.raises(TypeError):
-      self._serialize_call_function_request_helper('module', '5', {'a'})
+      self._serialize_call_function_request_helper('module', '5', {'a'}, 0.0)
+    with pytest.raises(TypeError):
+      self._serialize_call_function_request_helper('module', 'func', [], 'sec')
 
   def test_serialize_request(self):
     self._serialize_request_helper('', '')
     self._serialize_request_helper(
         'call_function',
-        serialize_call_function_request('module name', 'function', ['args'])
+        serialize_call_function_request(
+            'module name', 'function', ['args'], 1.0
+        )
     )
     with pytest.raises(TypeError):
       self._serialize_request_helper(123, 'data')

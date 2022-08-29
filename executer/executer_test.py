@@ -29,9 +29,11 @@ class FakeOutput:
 
 
 def _serialize_function_call_request_helper(
-    module_name: str, function: str, args: list
+    module_name: str, function: str, args: list, timeout: float
 ) -> str:
-  request_data = serialize_call_function_request(module_name, function, args)
+  request_data = serialize_call_function_request(
+      module_name, function, args, timeout
+  )
   return serialize_request('call_function', request_data)
 
 
@@ -42,11 +44,11 @@ class TestExecuter:
   def test_call_function(self):
     module = 'test_data.script'
     requests = [
-        _serialize_function_call_request_helper(module, 'getArray', [4]),
+        _serialize_function_call_request_helper(module, 'getArray', [4], 0.0),
         _serialize_function_call_request_helper(
-            module, 'getMap', ['key', 123]
+            module, 'getMap', ['key', 123], 0.0
         ),
-        _serialize_function_call_request_helper(module, 'getSquare', [6])
+        _serialize_function_call_request_helper(module, 'getSquare', [6], 0.0)
     ]
     output = FakeOutput()
     Executer().run(FakeInputIter(requests), output)
@@ -57,7 +59,9 @@ class TestExecuter:
 
   def test_missing_module(self):
     module = 'test_data.missing_scirpt'
-    requests = [_serialize_function_call_request_helper(module, 'func', [])]
+    requests = [
+        _serialize_function_call_request_helper(module, 'func', [], 0.0)
+    ]
     output = FakeOutput()
     Executer().run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Module not found"}\n'
@@ -66,7 +70,9 @@ class TestExecuter:
   def test_missing_function(self):
     module = 'test_data.script'
     requests = [
-        _serialize_function_call_request_helper(module, 'missing_func', [])
+        _serialize_function_call_request_helper(
+            module, 'missing_func', [], 0.0
+        )
     ]
     output = FakeOutput()
     Executer().run(FakeInputIter(requests), output)
@@ -76,7 +82,9 @@ class TestExecuter:
   def test_wrong_arguments(self):
     module = 'test_data.script'
     requests = [
-        _serialize_function_call_request_helper(module, 'getArray', [1, 2])
+        _serialize_function_call_request_helper(
+            module, 'getArray', [1, 2], 0.0
+        )
     ]
     output = FakeOutput()
     Executer().run(FakeInputIter(requests), output)
@@ -84,7 +92,9 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
     requests = [
-        _serialize_function_call_request_helper(module, 'getArray', ['1'])
+        _serialize_function_call_request_helper(
+            module, 'getArray', ['1'], 0.0
+        )
     ]
     output = FakeOutput()
     Executer().run(FakeInputIter(requests), output)

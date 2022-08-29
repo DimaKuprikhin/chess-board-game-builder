@@ -8,7 +8,7 @@ def check_type(obj, type):
 
 
 def serialize_call_function_request(
-    module_name: str, function: str, args: list
+    module_name: str, function: str, args: list, timeout: float
 ) -> str:
   '''
   Function call request contains of a name of the module, a name of the
@@ -19,16 +19,18 @@ def serialize_call_function_request(
   check_type(module_name, str)
   check_type(function, str)
   check_type(args, list)
+  check_type(timeout, float)
   return json.dumps({
       'module_name': module_name,
       'function': function,
-      'args': args
+      'args': args,
+      'timeout': timeout
   })
 
 
 def deserialize_call_function_request(
     serialized: str
-) -> Tuple[str, str, list]:
+) -> Tuple[str, str, list, float]:
   '''
   After deserializing, makes sure that deserialized module_name, function name
   and args have the correct types.
@@ -37,10 +39,12 @@ def deserialize_call_function_request(
   module_name = deserialized['module_name']
   function = deserialized['function']
   args = deserialized['args']
+  timeout = deserialized['timeout']
   check_type(module_name, str)
   check_type(function, str)
   check_type(args, list)
-  return module_name, function, args
+  check_type(timeout, float)
+  return module_name, function, args, timeout
 
 
 def serialize_request(request_type: str, request_data: str) -> str:
