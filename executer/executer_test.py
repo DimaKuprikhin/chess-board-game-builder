@@ -100,3 +100,37 @@ class TestExecuter:
     Executer().run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Wrong arguments"}\n'
     assert output.get_data() == expected_output
+
+  def test_exception_throw_by_script(self):
+    requests = [
+        _serialize_function_call_request_helper(
+            'test_data.exception_thrower', 'function_that_throws_ex',
+            ['exception from script function'], 0.1
+        )
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Exception in script: exception from script function"}\n'
+    assert output.get_data() == expected_output
+
+  def test_infinite_loop(self):
+    requests = [
+        _serialize_function_call_request_helper(
+            'test_data.infinite_loop', 'run_infinite_loop', [], 0.1
+        )
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Function timed out"}\n'
+    assert output.get_data() == expected_output
+
+  def test_heavy_function(self):
+    requests = [
+        _serialize_function_call_request_helper(
+            'test_data.heavy_function', 'run_heavy_function', [], 0.1
+        )
+    ]
+    output = FakeOutput()
+    Executer().run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Function timed out"}\n'
+    assert output.get_data() == expected_output

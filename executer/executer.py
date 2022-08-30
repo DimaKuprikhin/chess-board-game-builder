@@ -61,8 +61,6 @@ class Executer:
     except TypeError as ex:
       # Wrong number or types of arguments.
       return False, 'Wrong arguments'
-    except Exception as ex:
-      return False, 'Unknown error'
 
   def _handle_request(self, request: str) -> Tuple[bool, Any]:
     '''
@@ -74,9 +72,12 @@ class Executer:
       module_name, function, args, timeout = executer_utils.deserialize_call_function_request(
           request_data
       )
-      return self._call_function_with_timeout(
-          module_name, function, args, timeout
-      )
+      try:
+        return self._call_function_with_timeout(
+            module_name, function, args, timeout
+        )
+      except Exception as ex:
+        return False, 'Exception in script: ' + str(ex)
     else:
       return False, 'Unknown request type'
 
