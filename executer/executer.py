@@ -1,12 +1,27 @@
+from executer import executer_utils
 import importlib
+import resource
 import signal
 from typing import Any, Tuple
-from executer import executer_utils
 
 
 class Executer:
-  def __init__(self):
-    self.scripts = {}
+  def __init__(self, init_by_test=False):
+    KB = 1024
+    MB = 1024 * KB
+
+    # This is the maximum size of the process's virtual memory (address space).
+    MEM_LIMIT = 128 * MB
+    resource.setrlimit(resource.RLIMIT_AS, [MEM_LIMIT, MEM_LIMIT])
+
+    # Pytest needs file manipulations.
+    FILE_LIMIT = 4 * KB if init_by_test else 0
+    resource.setrlimit(resource.RLIMIT_FSIZE, [FILE_LIMIT, FILE_LIMIT])
+    FD_LIMIT = 12 if init_by_test else 0
+    resource.setrlimit(resource.RLIMIT_NOFILE, [FD_LIMIT, FD_LIMIT])
+
+    resource.setrlimit(resource.RLIMIT_NPROC, [0, 0])
+    resource.setrlimit(resource.RLIMIT_MEMLOCK, [0, 0])
 
   def _call_function_with_timeout(
       self, module_name: str, function: str, args: list, timeout: float
@@ -61,6 +76,9 @@ class Executer:
     except TypeError as ex:
       # Wrong number or types of arguments.
       return False, 'Wrong arguments'
+    except MemoryError as ex:
+      # Memory resource limit exceeded by user script.
+      return False, 'Memory limit exceeded'
 
   def _handle_request(self, request: str) -> Tuple[bool, Any]:
     '''

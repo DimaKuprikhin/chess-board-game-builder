@@ -40,7 +40,7 @@ def _serialize_function_call_request_helper(
 
 class TestExecuter:
   def test_empty_run(self):
-    Executer().run(FakeInputIter([]), FakeOutput())
+    Executer(True).run(FakeInputIter([]), FakeOutput())
 
   def test_call_function(self):
     module = 'test_data.script'
@@ -52,7 +52,7 @@ class TestExecuter:
         _serialize_function_call_request_helper(module, 'getSquare', [6], 0.0)
     ]
     output = FakeOutput()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     expected_output = '{"status": true, "result": [0, 1, 2, 3]}\n'
     expected_output += '{"status": true, "result": {"key": 123}}\n'
     expected_output += '{"status": true, "result": 36}\n'
@@ -64,7 +64,7 @@ class TestExecuter:
         _serialize_function_call_request_helper(module, 'func', [], 0.0)
     ]
     output = FakeOutput()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Module not found"}\n'
     assert output.get_data() == expected_output
 
@@ -76,7 +76,7 @@ class TestExecuter:
         )
     ]
     output = FakeOutput()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Function not found"}\n'
     assert output.get_data() == expected_output
 
@@ -88,7 +88,7 @@ class TestExecuter:
         )
     ]
     output = FakeOutput()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Wrong arguments"}\n'
     assert output.get_data() == expected_output
 
@@ -98,7 +98,7 @@ class TestExecuter:
         )
     ]
     output = FakeOutput()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Wrong arguments"}\n'
     assert output.get_data() == expected_output
 
@@ -110,7 +110,7 @@ class TestExecuter:
         )
     ]
     output = FakeOutput()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     expected_output = '{"status": false, "result": "Exception in script: exception from script function"}\n'
     assert output.get_data() == expected_output
 
@@ -123,7 +123,7 @@ class TestExecuter:
     ]
     output = FakeOutput()
     start = time.time()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     end = time.time()
     expected_output = '{"status": false, "result": "Function timed out"}\n'
     assert output.get_data() == expected_output
@@ -138,8 +138,29 @@ class TestExecuter:
     ]
     output = FakeOutput()
     start = time.time()
-    Executer().run(FakeInputIter(requests), output)
+    Executer(True).run(FakeInputIter(requests), output)
     end = time.time()
     expected_output = '{"status": false, "result": "Function timed out"}\n'
     assert output.get_data() == expected_output
     assert (end - start) < 1.1 * timeout
+
+  def test_memory_limit(self):
+    requests = [
+        _serialize_function_call_request_helper(
+            'test_data.memory_user', 'good_memory_user', [], 0.1
+        )
+    ]
+    output = FakeOutput()
+    Executer(True).run(FakeInputIter(requests), output)
+    expected_output = '{"status": true, "result": 0}\n'
+    assert output.get_data() == expected_output
+
+    requests = [
+        _serialize_function_call_request_helper(
+            'test_data.memory_user', 'bad_memory_user', [], 0.1
+        )
+    ]
+    output = FakeOutput()
+    Executer(True).run(FakeInputIter(requests), output)
+    expected_output = '{"status": false, "result": "Memory limit exceeded"}\n'
+    assert output.get_data() == expected_output
