@@ -1,3 +1,4 @@
+import time
 from executer.executer import Executer
 from executer.executer_utils import *
 
@@ -114,23 +115,31 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
   def test_infinite_loop(self):
+    timeout = 0.1
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.infinite_loop', 'run_infinite_loop', [], 0.1
+            'test_data.infinite_loop', 'run_infinite_loop', [], timeout
         )
     ]
     output = FakeOutput()
+    start = time.time()
     Executer().run(FakeInputIter(requests), output)
+    end = time.time()
     expected_output = '{"status": false, "result": "Function timed out"}\n'
     assert output.get_data() == expected_output
+    assert (end - start) < 1.1 * timeout
 
   def test_heavy_function(self):
+    timeout = 0.1
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.heavy_function', 'run_heavy_function', [], 0.1
+            'test_data.heavy_function', 'run_heavy_function', [], timeout
         )
     ]
     output = FakeOutput()
+    start = time.time()
     Executer().run(FakeInputIter(requests), output)
+    end = time.time()
     expected_output = '{"status": false, "result": "Function timed out"}\n'
     assert output.get_data() == expected_output
+    assert (end - start) < 1.1 * timeout
