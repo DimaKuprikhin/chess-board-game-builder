@@ -46,13 +46,15 @@ class TestExecuter:
     Executer(True).run(FakeInputIter([]), FakeOutput())
 
   def test_call_function(self):
-    module = 'test_data.script'
+    module = 'test_data.functions'
     requests = [
-        _serialize_function_call_request_helper(module, 'getArray', [4], 0.0),
+        _serialize_function_call_request_helper(module, 'get_array', [4], 0.0),
         _serialize_function_call_request_helper(
-            module, 'getMap', ['key', 123], 0.0
+            module, 'get_map', ['key', 123], 0.0
         ),
-        _serialize_function_call_request_helper(module, 'getSquare', [6], 0.0)
+        _serialize_function_call_request_helper(
+            module, 'get_square', [6], 0.0
+        )
     ]
     output = FakeOutput()
     Executer(True).run(FakeInputIter(requests), output)
@@ -72,7 +74,7 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
   def test_missing_function(self):
-    module = 'test_data.script'
+    module = 'test_data.functions'
     requests = [
         _serialize_function_call_request_helper(
             module, 'missing_func', [], 0.0
@@ -84,10 +86,10 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
   def test_wrong_arguments(self):
-    module = 'test_data.script'
+    module = 'test_data.functions'
     requests = [
         _serialize_function_call_request_helper(
-            module, 'getArray', [1, 2], 0.0
+            module, 'get_array', [1, 2], 0.0
         )
     ]
     output = FakeOutput()
@@ -97,7 +99,7 @@ class TestExecuter:
 
     requests = [
         _serialize_function_call_request_helper(
-            module, 'getArray', ['1'], 0.0
+            module, 'get_array', ['1'], 0.0
         )
     ]
     output = FakeOutput()
@@ -108,7 +110,7 @@ class TestExecuter:
   def test_exception_throw_by_script(self):
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.exception_thrower', 'function_that_throws_ex',
+            'test_data.exception_thrower', 'throw_ex',
             ['exception from script function'], 0.1
         )
     ]
@@ -136,7 +138,7 @@ class TestExecuter:
     timeout = 0.1
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.heavy_function', 'run_heavy_function', [], timeout
+            'test_data.heavy_functions', 'heavy_function', [], timeout
         )
     ]
     output = FakeOutput()
@@ -149,7 +151,7 @@ class TestExecuter:
 
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.heavy_function', 'heavy_power', [], timeout
+            'test_data.heavy_functions', 'heavy_power', [], timeout
         )
     ]
     output = FakeOutput()
@@ -163,7 +165,7 @@ class TestExecuter:
   def test_memory_limit(self):
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.memory_user', 'good_memory_user', [], 0.1
+            'test_data.memory_users', 'good_memory_user', [], 0.1
         )
     ]
     output = FakeOutput()
@@ -173,7 +175,7 @@ class TestExecuter:
 
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.memory_user', 'bad_memory_user', [], 0.1
+            'test_data.memory_users', 'bad_memory_user', [], 0.1
         )
     ]
     output = FakeOutput()

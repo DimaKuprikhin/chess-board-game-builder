@@ -14,7 +14,7 @@ class ExecuterHost:
     '''
     Executer created for testing by pytest needs specific resource limits.
     '''
-    self.executers = None
+    self.executer = None
     self.init_by_test = init_by_test
 
   def create_executer(self) -> bool:
@@ -45,7 +45,7 @@ class ExecuterHost:
     Sends request to executer to call a certain function from a certain module
     with the given arguments. Returns status of the call and result.
     '''
-    if not self.executer:
+    if self.executer is None:
       return False, 'Executer hasn\'t been created'
 
     request_data = executer_utils.serialize_call_function_request(
@@ -71,12 +71,12 @@ class ExecuterHost:
     successfully. True result doesn't mean executer is still running, use
     `is_alive()` for it.
     '''
-    return not self.executer
+    return self.executer is not None
 
   def is_alive(self) -> bool:
     '''
     Returns true if executer is still running and can be requested.
     '''
-    if not self.executer:
+    if self.executer is None:
       return False
     return self.executer.poll() is None

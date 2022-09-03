@@ -1,2 +1,2 @@
-def function_that_throws_ex(message):
+def throw_ex(message):
   raise Exception(message)

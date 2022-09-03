@@ -1,11 +1,12 @@
-def run_heavy_function():
-  return fibonacci(100)
-
-
-def fibonacci(n):
+def _fibonacci(n):
   if n < 2:
     return n
-  return fibonacci(n - 1) + fibonacci(n - 2)
+  return _fibonacci(n - 1) + _fibonacci(n - 2)
+
+
+def heavy_function():
+  return _fibonacci(100)
+
 
 def heavy_power():
   '''
