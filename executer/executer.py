@@ -102,10 +102,11 @@ class Executer:
   def run(self, input_iter, output):
     '''
     Runs an infinite loop in which Executer receives requests from the
-    ExecuterManager from the main process and sends responses.
+    ExecuterHost from the main process and sends responses.
     '''
     for request in input_iter:
       request = request.strip()
       status, result = self._handle_request(request)
       response = executer_utils.serialize_response(status, result)
       output.write(response + '\n')
+      output.flush()
