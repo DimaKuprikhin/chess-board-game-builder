@@ -25,6 +25,9 @@ class FakeOutput:
   def write(self, data: str):
     self.data += data
 
+  def flush(self):
+    return
+
   def get_data(self) -> str:
     return self.data
 
@@ -134,6 +137,19 @@ class TestExecuter:
     requests = [
         _serialize_function_call_request_helper(
             'test_data.heavy_function', 'run_heavy_function', [], timeout
+        )
+    ]
+    output = FakeOutput()
+    start = time.time()
+    Executer(True).run(FakeInputIter(requests), output)
+    end = time.time()
+    expected_output = '{"status": false, "result": "Function timed out"}\n'
+    assert output.get_data() == expected_output
+    assert (end - start) < 1.1 * timeout
+
+    requests = [
+        _serialize_function_call_request_helper(
+            'test_data.heavy_function', 'heavy_power', [], timeout
         )
     ]
     output = FakeOutput()
