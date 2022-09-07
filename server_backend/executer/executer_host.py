@@ -1,7 +1,7 @@
 import subprocess as sp
 import sys
 from typing import Any, Tuple
-from executer import executer_utils
+from server_backend.executer import executer_utils
 
 
 class ExecuterHost:
@@ -27,7 +27,7 @@ class ExecuterHost:
       return False
 
     script = 'import sys;'
-    script += 'from executer.executer import Executer;'
+    script += 'from server_backend.executer.executer import Executer;'
     if self.init_by_test:
       script += 'Executer(True).run(sys.stdin, sys.stdout)'
     else:

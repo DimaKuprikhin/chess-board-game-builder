@@ -1,4 +1,4 @@
-from executer.executer_host import ExecuterHost
+from server_backend.executer.executer_host import ExecuterHost
 
 
 class TestExecuterHost:
@@ -36,12 +36,12 @@ class TestExecuterHost:
   def test_call_function_without_executer(self):
     host = self._create_executer_host_helper()
     self._call_function_helper(
-        host, 'test_data.functions', 'get_array', [1], False,
+        host, 'server_backend.test_data.functions', 'get_array', [1], False,
         'Executer hasn\'t been created'
     )
 
   def test_call_function(self):
-    module = 'test_data.functions'
+    module = 'server_backend.test_data.functions'
     host = self._create_executer_host_helper()
     self._create_executer_helper(host)
     self._call_function_helper(
@@ -59,7 +59,7 @@ class TestExecuterHost:
   def test_script_exception(self):
     host = ExecuterHost(True)
     host.create_executer()
-    module = 'test_data.exception_thrower'
+    module = 'server_backend.test_data.exception_thrower'
     function = 'throw_ex'
     args = ['message for exception']
     status, result = host.call_script_function(module, function, args, 0.1)
@@ -70,14 +70,14 @@ class TestExecuterHost:
     host = self._create_executer_host_helper()
     self._create_executer_helper(host)
     self._call_function_helper(
-        host, 'test_data.infinite_loop', 'run_infinite_loop', [], False,
+        host, 'server_backend.test_data.infinite_loop', 'run_infinite_loop', [], False,
         'Function timed out'
     )
 
   def test_heavy_function(self):
     host = self._create_executer_host_helper()
     self._create_executer_helper(host)
-    module = 'test_data.heavy_functions'
+    module = 'server_backend.test_data.heavy_functions'
     self._call_function_helper(
         host, module, 'heavy_function', [], False, 'Function timed out'
     )
@@ -88,7 +88,7 @@ class TestExecuterHost:
   def test_memory_limit(self):
     host = self._create_executer_host_helper()
     self._create_executer_helper(host)
-    module = 'test_data.memory_users'
+    module = 'server_backend.test_data.memory_users'
     self._call_function_helper(host, module, 'good_memory_user', [], True, 0)
     self._call_function_helper(
         host, module, 'bad_memory_user', [], False, 'Memory limit exceeded'

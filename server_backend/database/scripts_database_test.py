@@ -1,5 +1,5 @@
 import importlib
-from database.scripts_database import *
+from server_backend.database.scripts_database import *
 
 
 class TestScriptsDatabase:
@@ -33,12 +33,11 @@ class TestScriptsDatabase:
     self._remove_script(db, second_id)
     assert db.contains(first_id)
     self._remove_script(db, first_id)
-    assert db.contains(second_id)
 
   def test_import_by_module_name(self):
     db = ScriptsDatabase(
-        pathlib.PosixPath('test_data', 'scripts_db_data'),
-        'test_data.scripts_db_data'
+        pathlib.PosixPath('server_backend', 'test_data', 'scripts_db_data'),
+        'server_backend.test_data.scripts_db_data'
     )
     script_id = db.add_script('')
     module_name = db.get_module_name(script_id)

@@ -1,4 +1,4 @@
-from database.games_database import *
+from server_backend.database.games_database import *
 
 
 class TestGamesDatabase:

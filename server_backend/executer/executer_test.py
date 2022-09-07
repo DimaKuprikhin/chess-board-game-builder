@@ -1,7 +1,9 @@
 import time
-from executer.executer import Executer
-from executer.executer_utils import *
+from server_backend.executer.executer import Executer
+from server_backend.executer.executer_utils import *
 
+
+TEST_DATA_MODULE = 'server_backend.test_data'
 
 class FakeInputIter:
   def __init__(self, lines):
@@ -46,7 +48,7 @@ class TestExecuter:
     Executer(True).run(FakeInputIter([]), FakeOutput())
 
   def test_call_function(self):
-    module = 'test_data.functions'
+    module = TEST_DATA_MODULE + '.functions'
     requests = [
         _serialize_function_call_request_helper(module, 'get_array', [4], 0.0),
         _serialize_function_call_request_helper(
@@ -64,7 +66,7 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
   def test_missing_module(self):
-    module = 'test_data.missing_scirpt'
+    module = TEST_DATA_MODULE + '.missing_scirpt'
     requests = [
         _serialize_function_call_request_helper(module, 'func', [], 0.0)
     ]
@@ -74,7 +76,7 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
   def test_missing_function(self):
-    module = 'test_data.functions'
+    module = TEST_DATA_MODULE + '.functions'
     requests = [
         _serialize_function_call_request_helper(
             module, 'missing_func', [], 0.0
@@ -86,7 +88,7 @@ class TestExecuter:
     assert output.get_data() == expected_output
 
   def test_wrong_arguments(self):
-    module = 'test_data.functions'
+    module = TEST_DATA_MODULE + '.functions'
     requests = [
         _serialize_function_call_request_helper(
             module, 'get_array', [1, 2], 0.0
@@ -110,7 +112,7 @@ class TestExecuter:
   def test_exception_throw_by_script(self):
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.exception_thrower', 'throw_ex',
+            TEST_DATA_MODULE + '.exception_thrower', 'throw_ex',
             ['exception from script function'], 0.1
         )
     ]
@@ -123,7 +125,7 @@ class TestExecuter:
     timeout = 0.1
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.infinite_loop', 'run_infinite_loop', [], timeout
+            TEST_DATA_MODULE + '.infinite_loop', 'run_infinite_loop', [], timeout
         )
     ]
     output = FakeOutput()
@@ -136,9 +138,10 @@ class TestExecuter:
 
   def test_heavy_function(self):
     timeout = 0.1
+    module_name = TEST_DATA_MODULE + '.heavy_functions'
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.heavy_functions', 'heavy_function', [], timeout
+            module_name, 'heavy_function', [], timeout
         )
     ]
     output = FakeOutput()
@@ -151,7 +154,7 @@ class TestExecuter:
 
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.heavy_functions', 'heavy_power', [], timeout
+            module_name, 'heavy_power', [], timeout
         )
     ]
     output = FakeOutput()
@@ -163,9 +166,10 @@ class TestExecuter:
     assert (end - start) < 1.1 * timeout
 
   def test_memory_limit(self):
+    module_name = TEST_DATA_MODULE + '.memory_users'
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.memory_users', 'good_memory_user', [], 0.1
+            module_name, 'good_memory_user', [], 0.1
         )
     ]
     output = FakeOutput()
@@ -175,7 +179,7 @@ class TestExecuter:
 
     requests = [
         _serialize_function_call_request_helper(
-            'test_data.memory_users', 'bad_memory_user', [], 0.1
+            module_name, 'bad_memory_user', [], 0.1
         )
     ]
     output = FakeOutput()

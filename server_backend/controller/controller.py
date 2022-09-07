@@ -1,8 +1,8 @@
 import pathlib
 from typing import Any, Tuple
-from database import games_database
-from database import scripts_database
-from script_checker import script_checker
+from server_backend.database import games_database
+from server_backend.database import scripts_database
+from server_backend.script_checker import script_checker
 
 
 class Controller:
