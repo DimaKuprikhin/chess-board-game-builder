@@ -5,7 +5,7 @@ class ScriptChecker:
   def __init__(self):
     return
 
-  def check_script(module_name: str) -> bool:
+  def check_script(self, module_name: str) -> bool:
     '''
     Returns true if script located in `module_name` is considered safe and
     contains no malware instructions.
