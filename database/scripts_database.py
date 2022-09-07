@@ -46,6 +46,12 @@ class ScriptsDatabase:
       f.write(script)
     return script_id
 
+  def contains(self, script_id: int) -> bool:
+    '''
+    Returns True, if the database contains an entry with the given script id.
+    '''
+    return script_id in self.scripts
+
   def get_module_name(self, script_id: int) -> str:
     '''
     Returns a unique scripts module name, which can be imported in other
