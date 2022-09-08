@@ -24,6 +24,8 @@ class ScriptsDatabase:
     a prefix for module names of stored scripts and must correspond
     `db_dir_path`.
     '''
+    assert isinstance(db_dir_path, pathlib.PosixPath)
+    assert isinstance(base_module_name, str)
     self.db_dir_path = db_dir_path
     if not os.path.exists(db_dir_path):
       os.mkdir(db_dir_path)
@@ -40,7 +42,7 @@ class ScriptsDatabase:
     script_id = self.next_free_id
     self.next_free_id += 1
     module_name = self.base_module_name + '.' + str(script_id)
-    script_path = self.db_dir_path / (str(script_id) + '.py')
+    script_path = self.db_dir_path.joinpath(str(script_id) + '.py')
     self.scripts[script_id] = ScriptsDatabase.Entry(module_name, script_path)
     with open(script_path, 'w') as f:
       f.write(script)
