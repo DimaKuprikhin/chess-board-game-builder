@@ -1,13 +1,8 @@
-class ScriptChecker:
+def check_script(script: str) -> bool:
   '''
-  Checks scripts for possible malwareness.
+  Returns true if script is considered safe and
+  contains no malware instructions.
   '''
-  def __init__(self):
-    return
-
-  def check_script(self, module_name: str) -> bool:
-    '''
-    Returns true if script located in `module_name` is considered safe and
-    contains no malware instructions.
-    '''
-    return True
+  if not isinstance(script, str):
+    return False
+  return True
