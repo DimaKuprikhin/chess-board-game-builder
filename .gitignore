@@ -1,3 +1,16 @@
-__pycache__
-.pytest_cache
-test_data/scripts_db_data
+# Pycache.
+__pycache__/
+*.pyc
+
+# Pytest and testing dirs.
+.pytest_cache/
+.coverage
+test_data/scripts_db_data/
+
+# Directory for script files.
+scripts/
+
+# Flask.
+instance/
+venv/
+*.egg-info/
