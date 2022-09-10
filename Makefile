@@ -12,7 +12,6 @@ clean:
 	@find ./ -type d -name ${PYCACHE} -exec rmdir {} \;
 	@find ./server_backend/test_data -type d -name ${TEST_SCRIPTS_DIR} -exec rmdir {} \;
 	@find ./ -type d -name ${PYTEST_CACHE} -exec rmdir {} \;
-	@rm -r scripts/*
 
 format:
 	@yapf3 --in-place ./*.py
