@@ -2,8 +2,8 @@ import time
 from server_backend.executer.executer import Executer
 from server_backend.executer.executer_utils import *
 
-
 TEST_DATA_MODULE = 'server_backend.test_data'
+
 
 class FakeInputIter:
   def __init__(self, lines):
@@ -125,7 +125,8 @@ class TestExecuter:
     timeout = 0.1
     requests = [
         _serialize_function_call_request_helper(
-            TEST_DATA_MODULE + '.infinite_loop', 'run_infinite_loop', [], timeout
+            TEST_DATA_MODULE + '.infinite_loop', 'run_infinite_loop', [],
+            timeout
         )
     ]
     output = FakeOutput()

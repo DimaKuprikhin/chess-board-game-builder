@@ -70,8 +70,8 @@ class TestExecuterHost:
     host = self._create_executer_host_helper()
     self._create_executer_helper(host)
     self._call_function_helper(
-        host, 'server_backend.test_data.infinite_loop', 'run_infinite_loop', [], False,
-        'Function timed out'
+        host, 'server_backend.test_data.infinite_loop', 'run_infinite_loop',
+        [], False, 'Function timed out'
     )
 
   def test_heavy_function(self):
