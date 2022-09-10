@@ -1,59 +1,40 @@
-class GamesDatabase:
-  class Entry:
-    def __init__(self, script_id: int, game_state):
-      self.script_id = script_id
-      self.game_state = game_state
+import sqlite3
 
-    def get_game_state(self):
-      return self.game_state
 
-    def set_game_state(self, game_state):
-      self.game_state = game_state
+def add_game(db: sqlite3.Connection, user_id: int, script_id: int) -> int:
+  '''
+  Adds a new entry in the database. Returns game id.
+  '''
+  db.execute(
+      'INSERT INTO games (user_id, script_id) VALUES (?, ?);',
+      [user_id, script_id]
+  )
+  db.commit()
+  # TODO: is there some better way to do it?
+  return db.execute('SELECT id FROM games ORDER BY id DESC LIMIT 1;'
+                    ).fetchone()['id']
 
-    def get_script_id(self):
-      return self.script_id
 
-  def __init__(self):
-    self.games = {}
+def get_script_id(db: sqlite3.Connection, game_id: int) -> int:
+  '''
+  Returns script id of the entry with the giver game id. If the database
+  doesn't contain an entry with this game id, returns None.
+  '''
+  result = db.execute('SELECT script_id FROM games WHERE id == ?;',
+                      [game_id]).fetchone()
+  return None if result is None else result['script_id']
 
-  def add_game(self, user_id: int, script_id: int, game_state) -> bool:
-    '''
-    Adds a new entry in the database. On success, returns True. If the database
-    already contains an entry with the given user id, doesn't change its state
-    and returns False.
-    '''
-    if user_id in self.games:
-      return False
-    self.games[user_id] = GamesDatabase.Entry(script_id, game_state)
-    return True
 
-  def get_script_id(self, user_id: int) -> int:
-    '''
-    Returns script id of the entry with the giver user id. If the database
-    doesn't contain an entry with this user id, returns None.
-    '''
-    if user_id not in self.games:
-      return None
-    return self.games[user_id].get_script_id()
-
-  def get_game_state(self, user_id: int):
-    if user_id not in self.games:
-      return None
-    return self.games[user_id].get_game_state()
-
-  def update_game_state(self, user_id: int, game_state) -> bool:
-    if user_id not in self.games:
-      return False
-    self.games[user_id].set_game_state(game_state)
-    return True
-
-  def remove_game(self, user_id: int) -> bool:
-    '''
-    Removes an entry with the given user id from the database. If the database
-    doesn't contain an entry with this user id, returns False and doesn't
-    change its state.
-    '''
-    if user_id not in self.games:
-      return False
-    self.games.pop(user_id)
-    return True
+def remove_game(db: sqlite3.Connection, game_id: int) -> bool:
+  '''
+  Removes an entry with the given game id from the database. If the database
+  doesn't contain an entry with this game id, returns False and doesn't
+  change its state.
+  '''
+  result = db.execute('SELECT id FROM games WHERE id == ?;',
+                      [game_id]).fetchone()
+  if result is None:
+    return False
+  db.execute('DELETE FROM games WHERE id == ?;', [game_id])
+  db.commit()
+  return True

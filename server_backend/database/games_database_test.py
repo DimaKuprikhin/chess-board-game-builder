@@ -2,47 +2,44 @@ from server_backend.database.games_database import *
 
 
 class TestGamesDatabase:
-  def _create_db(self) -> GamesDatabase:
-    db = GamesDatabase()
-    assert db.get_game_state(1) is None
-    assert db.get_script_id(1) is None
-    assert not db.update_game_state(1, None)
-    assert not db.remove_game(1)
+  def _get_db(self) -> sqlite3.Connection:
+    DB_SETUP_SCRIPT_PATH = './flaskr/schema.sql'
+    db = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
+    db.row_factory = sqlite3.Row
+    with open(DB_SETUP_SCRIPT_PATH, 'r') as f:
+      db.executescript(f.read())
     return db
 
   def _add_game(
-      self, db: GamesDatabase, user_id: int, script_id: int, game_state
-  ):
-    assert db.add_game(user_id, script_id, game_state)
-    assert script_id == db.get_script_id(user_id)
-    assert game_state == db.get_game_state(user_id)
-    assert not db.add_game(user_id, 0, None)
-    assert script_id == db.get_script_id(user_id)
-    assert game_state == db.get_game_state(user_id)
+      self, db: sqlite3.Connection, user_id: int, script_id: int
+  ) -> int:
+    game_id = add_game(db, user_id, script_id)
+    assert isinstance(game_id, int)
+    assert script_id == get_script_id(db, game_id)
+    return game_id
 
-  def _remove_game(self, db: GamesDatabase, user_id: int):
-    assert db.remove_game(user_id)
-    assert not db.remove_game(user_id)
-    assert not db.get_game_state(user_id)
-    assert not db.get_script_id(user_id)
+  def _remove_game(self, db: sqlite3.Connection, game_id: int):
+    assert remove_game(db, game_id)
+    assert not remove_game(db, game_id)
+    assert get_script_id(db, game_id) is None
 
   def test_create_db(self):
-    self._create_db()
+    db = self._get_db()
+    db.execute('SELECT 1')
 
   def test_add_game(self):
-    db = self._create_db()
-    self._add_game(db, 1, 1, '')
-    self._add_game(db, 2, 2, '')
-    # Add game with the existing script id.
-    self._add_game(db, 3, 2, '')
+    db = self._get_db()
+    self._add_game(db, 1, 1)
+    self._add_game(db, 2, 2)
+    self._add_game(db, 1, 2)
 
   def test_remove_game(self):
-    db = self._create_db()
-    self._add_game(db, 1, 1, '')
-    self._remove_game(db, 1)
-    self._add_game(db, 1, 1, '')
-    self._add_game(db, 2, 2, '')
-    self._add_game(db, 3, 2, '')
-    self._remove_game(db, 2)
-    self._remove_game(db, 3)
-    self._remove_game(db, 1)
+    db = self._get_db()
+    first_id = self._add_game(db, 1, 1)
+    self._remove_game(db, first_id)
+    second_id = self._add_game(db, 1, 1)
+    third_id = self._add_game(db, 2, 2)
+    fourth_id = self._add_game(db, 3, 2)
+    self._remove_game(db, third_id)
+    self._remove_game(db, second_id)
+    self._remove_game(db, fourth_id)
