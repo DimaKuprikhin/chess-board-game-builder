@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flaskr import create_game
 from flaskr import db
 from flaskr import load_script
 
@@ -36,4 +37,5 @@ def create_app(test_config=None):
   db.init_app(app)
 
   app.register_blueprint(load_script.load_script_bp)
+  app.register_blueprint(create_game.create_game_bp)
   return app
