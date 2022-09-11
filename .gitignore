@@ -1,16 +1,47 @@
-# Pycache.
+## Pycache.
 __pycache__/
 *.pyc
 
-# Pytest and testing dirs.
+## Pytest and testing dirs.
 .pytest_cache/
 .coverage
 test_data/scripts_db_data/
 
-# Directory for script files.
+## Directory for script files.
 scripts/
 
-# Flask.
+## Flask.
 instance/
 venv/
 *.egg-info/
+
+## Java
+.mtj.tmp/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+## Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+pom.xml.bak
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+## IntelliJ
+out/
+.idea/
+.idea_modules/
+*.iml
+*.ipr
+*.iws
+
