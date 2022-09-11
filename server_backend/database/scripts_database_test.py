@@ -23,8 +23,12 @@ class TestScriptsDatabase:
     return script_id
 
   def _remove_script(self, db: sqlite3.Connection, script_id: int):
+    script_path = get_script_path(db, script_id)
+    assert os.path.exists(script_path.absolute())
     assert remove_script(db, script_id)
     assert get_module_name(db, script_id) is None
+    assert get_script_path(db, script_id) is None
+    assert not os.path.exists(script_path.absolute())
     assert not contains(db, script_id)
 
   def test_create_db(self):

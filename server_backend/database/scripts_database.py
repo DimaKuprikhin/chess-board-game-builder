@@ -56,6 +56,18 @@ def get_module_name(db: sqlite3.Connection, script_id: int) -> str:
   return None if result is None else result['module_name']
 
 
+def get_script_path(
+    db: sqlite3.Connection, script_id: int
+) -> pathlib.PosixPath:
+  '''
+  Returns a unique script path of the script with the given script id.
+  '''
+  result = db.execute(
+      'SELECT script_path FROM scripts WHERE id == ?;', [script_id]
+  ).fetchone()
+  return None if result is None else pathlib.PosixPath(result['script_path'])
+
+
 def remove_script(db: sqlite3.Connection, script_id: int) -> bool:
   '''
   Removes a script entry from the database and corresponding script file.
