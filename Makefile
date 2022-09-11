@@ -20,7 +20,7 @@ format:
 
 init:
 	@flask --app flaskr init-db
-	@rm -r ./scripts/*
+	@rm -rf ./scripts/*
 
 run:
 	@flask --app flaskr --debug run
