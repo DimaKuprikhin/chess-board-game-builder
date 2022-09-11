@@ -5,15 +5,17 @@ import java.util.List;
 
 public class Controller {
     private ChessBoardPanel boardPanel;
+    private HttpManager httpManager;
 
     public void addBoard(ChessBoardPanel boardPanel) {
         this.boardPanel = boardPanel;
+        this.httpManager = new HttpManager("http", "localhost", 5000);
     }
 
-    public void createGame(File scriptPath, String playAs) {
+    public void createGame(String script, String playAs) {
         // called by `CreateGameWindow` when create button clicked. It takes
         // values from filled form fields and send request to server.
-        
+        httpManager.createGame(script, playAs);
     }
 
     public void onCreateGameButton() {

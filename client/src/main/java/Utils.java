@@ -1,10 +1,14 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Utils {
     public static Map<String, Image> getPieceImages() {
@@ -26,5 +30,9 @@ public class Utils {
             }
         }
         return pieceImages;
+    }
+
+    public static String readFile(File file) throws IOException {
+        return Files.readString(file.toPath());
     }
 }

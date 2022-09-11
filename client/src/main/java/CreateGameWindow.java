@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.io.InvalidObjectException;
 
 public class CreateGameWindow {
     private final Controller controller;
@@ -106,7 +108,16 @@ public class CreateGameWindow {
                 } else {
                     playAs = "black";
                 }
-                controller.createGame(selectedFile, playAs);
+                String script;
+                try {
+                    script = Utils.readFile(selectedFile);
+                } catch(IOException ex) {
+                    String message = "Не удалось прочитать выбранный файл скрипта";
+                    String title = "Ошибка при чтении файла";
+                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                controller.createGame(script, playAs);
             }
         });
         pane.add(createButton);
