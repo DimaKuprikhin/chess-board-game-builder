@@ -10,7 +10,7 @@ load_script_bp = Blueprint('load_script', __name__, url_prefix='/load_script')
 @load_script_bp.route('/', methods=['POST'])
 def load_script():
   if request.content_length >= 1024 * 1024:
-    return (400, 'Data is too big')
+    return json.dumps({ 'status': False, 'message': 'Data too large'})
   request_json = json.loads(
       request.get_data(cache=False, as_text=True, parse_form_data=False)
   )
@@ -23,4 +23,4 @@ def load_script():
   )
   if status:
     return json.dumps({ 'script_id': result })
-  return (400, result)
+  return json.dumps({ 'status': False, 'message': result })

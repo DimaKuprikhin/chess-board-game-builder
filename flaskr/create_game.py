@@ -10,7 +10,7 @@ create_game_bp = Blueprint('create_game', __name__, url_prefix='/create_game')
 @create_game_bp.route('/', methods=['POST'])
 def create_game():
   if request.content_length >= 1024 * 1024:
-    return (400, 'Data is too big')
+    return json.dumps({ 'status': False, 'message': 'Data too large'})
   request_json = json.loads(
       request.get_data(cache=False, as_text=True, parse_form_data=False)
   )
@@ -20,4 +20,4 @@ def create_game():
   )
   if status:
     return json.dumps({ 'game_id': result })
-  return (400, result)
+  return json.dumps({ 'status': False, 'message': result })
