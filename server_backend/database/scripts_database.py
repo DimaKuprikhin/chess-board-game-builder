@@ -1,14 +1,7 @@
 import os
 import pathlib
-import random
-import string
 import sqlite3
-
-
-def _generate_unique_string(n: int) -> str:
-  return ''.join(
-      random.choice(string.ascii_letters + string.digits) for _ in range(n)
-  )
+from server_backend.common import utils
 
 
 def add_script(
@@ -19,7 +12,7 @@ def add_script(
   Adds user script to scripts table, creates a unique module name and
   a file in `scripts_dir`. On success, returns script id of the added script.
   '''
-  script_name = _generate_unique_string(3)
+  script_name = utils.generate_unique_string(3)
   module_name = base_module_name + '.' + script_name
   script_path = scripts_dir.joinpath(script_name + '.py').as_posix()
   db.execute(
