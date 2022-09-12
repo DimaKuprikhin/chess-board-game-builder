@@ -15,8 +15,10 @@ clean:
 
 format:
 	@yapf3 --in-place ./*.py
-	@yapf3 --in-place ./*/*.py
-	@yapf3 --in-place ./*/*/*.py
+	@yapf3 --in-place ./flask_tests/*.py
+	@yapf3 --in-place ./flaskr/*.py
+	@yapf3 --in-place ./server_backend/*.py
+	@yapf3 --in-place ./server_backend/*/*.py
 
 init:
 	@flask --app flaskr init-db
