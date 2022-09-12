@@ -20,8 +20,9 @@ def test_register(client: Client, app: Flask):
       }
   )
   assert response.status_code == 200
-  game_id = json.loads(response.get_data(as_text=True))['game_id']
-  assert isinstance(game_id, int)
+  result = json.loads(response.get_data(as_text=True))
+  assert isinstance(result['game_id'], int)
+  assert isinstance(result['link'], str)
   with app.app_context():
     assert get_db().execute("SELECT id FROM games WHERE user_id == ?;",
-                            [1]).fetchone()['id'] == game_id
+                            [1]).fetchone()['id'] == result['game_id']

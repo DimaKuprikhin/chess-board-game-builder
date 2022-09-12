@@ -11,5 +11,6 @@ CREATE TABLE scripts (
 CREATE TABLE games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    script_id INTEGER NOT NULL
+    script_id INTEGER NOT NULL,
+    link TEXT NOT NULL UNIQUE
 );

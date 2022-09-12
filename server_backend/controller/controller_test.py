@@ -23,4 +23,7 @@ class TestContoller:
     status, script_id = controller.load_script(db, 1, '')
     assert status
     assert isinstance(script_id, int)
-    controller.create_game(db, 1, script_id)
+    status, result = controller.create_game(db, 1, script_id)
+    assert status
+    assert isinstance(result['game_id'], int)
+    assert isinstance(result['link'], str)

@@ -3,6 +3,7 @@ import sqlite3
 from server_backend.database import games_database
 from server_backend.database import scripts_database
 from server_backend.script_checker import script_checker
+from server_backend.common import utils
 from typing import Any, Tuple
 
 
@@ -22,7 +23,11 @@ class Controller:
     '''
     if not scripts_database.contains(db, script_id):
       return False, 'There is no script with this script id: ' + str(script_id)
-    return True, games_database.add_game(db, user_id, script_id)
+    link = utils.generate_unique_string(8)
+    return True, {
+        'game_id': games_database.add_game(db, user_id, script_id, link),
+        'link': link
+    }
 
   def load_script(self, db: sqlite3.Connection, user_id: int,
                   script: str) -> Tuple[bool, Any]:

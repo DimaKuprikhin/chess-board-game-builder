@@ -19,5 +19,5 @@ def create_game():
       db.get_db(), request_json['user_id'], request_json['script_id']
   )
   if status:
-    return json.dumps({ 'game_id': result })
+    return json.dumps(result)
   return json.dumps({ 'status': False, 'message': result })
