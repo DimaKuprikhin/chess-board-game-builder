@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class Utils {
+    private static final Random rnd = new Random();
+
     public static Map<String, Image> getPieceImages() {
         BufferedImage all;
         try {
@@ -43,5 +45,9 @@ public class Utils {
 
     public static void showInfo(String title, String message) {
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static int randomInt(int bound) {
+        return rnd.nextInt(bound);
     }
 }

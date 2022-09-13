@@ -103,7 +103,7 @@ public class CreateGameWindow {
                 if (asWhiteRButton.isSelected()) {
                     playAs = "white";
                 } else if (asRandomRButton.isSelected()) {
-                    playAs = "random";
+                    playAs = Utils.randomInt(2) == 0 ? "white" : "black";
                 } else {
                     playAs = "black";
                 }
