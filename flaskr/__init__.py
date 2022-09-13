@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flaskr import create_game
 from flaskr import db
+from flaskr import join_by_link
 from flaskr import load_script
 
 
@@ -40,4 +41,5 @@ def create_app(test_config=None):
 
   app.register_blueprint(load_script.load_script_bp)
   app.register_blueprint(create_game.create_game_bp)
+  app.register_blueprint(join_by_link.join_by_link_bp)
   return app
