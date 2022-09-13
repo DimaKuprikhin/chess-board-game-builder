@@ -97,8 +97,7 @@ public class CreateGameWindow {
                     String message
                             = "Для создания игры, необходимо выбрать файл скрипта";
                     String title = "Ошибка при создании игры";
-                    JOptionPane.showMessageDialog(null, message, title,
-                                                  JOptionPane.ERROR_MESSAGE);
+                    Utils.showError(title, message);
                 }
                 String playAs;
                 if (asWhiteRButton.isSelected()) {
@@ -114,9 +113,10 @@ public class CreateGameWindow {
                 } catch(IOException ex) {
                     String message = "Не удалось прочитать выбранный файл скрипта";
                     String title = "Ошибка при чтении файла";
-                    JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+                    Utils.showError(title, message);
                     return;
                 }
+                frame.dispose();
                 controller.createGame(script, playAs);
             }
         });

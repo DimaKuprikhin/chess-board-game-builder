@@ -1,3 +1,5 @@
+import org.json.simple.JSONObject;
+
 import java.awt.*;
 import java.io.File;
 import java.net.http.HttpClient;
@@ -12,10 +14,28 @@ public class Controller {
         this.httpManager = new HttpManager("http", "localhost", 5000);
     }
 
+    private boolean checkResponseStatus(JSONObject response) {
+        if (response == null
+                || response.containsKey("status") && !((boolean) response.get(
+                "status"))) {
+            Utils.showError("Ошибка", (String) response.get("message"));
+            return false;
+        }
+        return true;
+    }
+
     public void createGame(String script, String playAs) {
         // called by `CreateGameWindow` when create button clicked. It takes
         // values from filled form fields and send request to server.
-        httpManager.createGame(script, playAs);
+        JSONObject response = httpManager.loadScript(script);
+        if (!checkResponseStatus(response)) {
+            return;
+        }
+        response = httpManager.createGame((long) response.get("script_id"),
+                                          playAs);
+        if (checkResponseStatus(response)) {
+            new LinkWindow((String) response.get("link"));
+        }
     }
 
     public void onCreateGameButton() {
