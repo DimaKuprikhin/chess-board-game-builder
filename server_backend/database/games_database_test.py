@@ -46,3 +46,10 @@ class TestGamesDatabase:
     self._remove_game(db, third_id)
     self._remove_game(db, second_id)
     self._remove_game(db, fourth_id)
+
+  def test_set_second_player_ip(self):
+    db = self._get_db()
+    game_id = self._add_game(db, '1', 'white', 100, 'unique_link')
+    assert set_second_player_ip(db, 'unique_link', '2')
+    assert not set_second_player_ip(db, 'unique_link', '3')
+    assert not set_second_player_ip(db, 'missing_link', '4')

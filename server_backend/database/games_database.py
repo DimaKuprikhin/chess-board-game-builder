@@ -18,6 +18,28 @@ def add_game(
                     ).fetchone()['id']
 
 
+def set_second_player_ip(
+    db: sqlite3.Connection, link: str, second_player_ip: str
+) -> bool:
+  '''
+  Sets value of `second_player_ip` field in entry with appropriate link. If
+  there is no such a link in the database or `second_player_ip` is already
+  set, returns False.
+  '''
+  result = db.execute(
+      'SELECT id FROM games WHERE second_player_ip IS NULL AND link == ?',
+      [link]
+  ).fetchone()
+  if result is None:
+    return False
+  db.execute(
+      'UPDATE games SET second_player_ip = ? WHERE id == ?',
+      [second_player_ip, result['id']]
+  )
+  db.commit()
+  return True
+
+
 def get_script_id(db: sqlite3.Connection, game_id: int) -> int:
   '''
   Returns script id of the entry with the giver game id. If the database
