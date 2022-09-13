@@ -12,8 +12,10 @@ class Controller:
     self.base_module_name = base_module_name
     self.scripts_dir = scripts_dir
 
-  def create_game(self, db: sqlite3.Connection, user_id: int,
-                  script_id: int) -> Tuple[bool, Any]:
+  def create_game(
+      self, db: sqlite3.Connection, first_player_ip: str,
+      first_player_play_as: str, script_id: int
+  ) -> Tuple[bool, Any]:
     '''
     Creates a game that uses script with the given script id. Script id must be
     a result of previously called `load_script`. If scripts database doesn't
@@ -24,10 +26,10 @@ class Controller:
     if not scripts_database.contains(db, script_id):
       return False, 'There is no script with this script id: ' + str(script_id)
     link = utils.generate_unique_string(8)
-    return True, {
-        'game_id': games_database.add_game(db, user_id, script_id, link),
-        'link': link
-    }
+    game_id = games_database.add_game(
+        db, first_player_ip, first_player_play_as, script_id, link
+    )
+    return True, { 'game_id': game_id, 'link': link }
 
   def load_script(self, db: sqlite3.Connection, user_id: int,
                   script: str) -> Tuple[bool, Any]:

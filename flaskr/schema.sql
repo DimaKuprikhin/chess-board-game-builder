@@ -10,7 +10,9 @@ CREATE TABLE scripts (
 
 CREATE TABLE games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
+    first_player_ip TEXT NOT NULL,
+    second_player_ip TEXT,
+    first_player_play_as TEXT NOT NULL CHECK (first_player_play_as = 'white' OR first_player_play_as = 'black'),
     script_id INTEGER NOT NULL,
     link TEXT NOT NULL UNIQUE
 );

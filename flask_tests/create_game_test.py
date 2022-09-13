@@ -16,7 +16,7 @@ def test_register(client: Client, app: Flask):
   response = client.post(
       '/create_game/', json={
           'script_id': script_id,
-          'user_id': 1
+          'play_as': 'white'
       }
   )
   assert response.status_code == 200
@@ -24,5 +24,6 @@ def test_register(client: Client, app: Flask):
   assert isinstance(result['game_id'], int)
   assert isinstance(result['link'], str)
   with app.app_context():
-    assert get_db().execute("SELECT id FROM games WHERE user_id == ?;",
-                            [1]).fetchone()['id'] == result['game_id']
+    assert get_db().execute(
+        'SELECT id FROM games WHERE first_player_ip == "127.0.0.1";'
+    ).fetchone()['id'] == result['game_id']

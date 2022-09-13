@@ -11,9 +11,12 @@ class TestGamesDatabase:
     return db
 
   def _add_game(
-      self, db: sqlite3.Connection, user_id: int, script_id: int, link: str
+      self, db: sqlite3.Connection, first_player_ip: str,
+      first_player_play_as: str, script_id: int, link: str
   ) -> int:
-    game_id = add_game(db, user_id, script_id, link)
+    game_id = add_game(
+        db, first_player_ip, first_player_play_as, script_id, link
+    )
     assert isinstance(game_id, int)
     assert script_id == get_script_id(db, game_id)
     return game_id
@@ -29,17 +32,17 @@ class TestGamesDatabase:
 
   def test_add_game(self):
     db = self._get_db()
-    self._add_game(db, 1, 1, 'link')
-    self._add_game(db, 2, 2, 'link2')
-    self._add_game(db, 1, 2, 'link3')
+    self._add_game(db, '1', 'white', 1, 'link')
+    self._add_game(db, '2', 'black', 2, 'link2')
+    self._add_game(db, '1', 'white', 2, 'link3')
 
   def test_remove_game(self):
     db = self._get_db()
-    first_id = self._add_game(db, 1, 1, 'link')
+    first_id = self._add_game(db, '1', 'black', 1, 'link')
     self._remove_game(db, first_id)
-    second_id = self._add_game(db, 1, 1, 'link2')
-    third_id = self._add_game(db, 2, 2, 'link3')
-    fourth_id = self._add_game(db, 3, 2, 'link4')
+    second_id = self._add_game(db, '1', 'white', 1, 'link2')
+    third_id = self._add_game(db, '2', 'black', 2, 'link3')
+    fourth_id = self._add_game(db, '3', 'black', 2, 'link4')
     self._remove_game(db, third_id)
     self._remove_game(db, second_id)
     self._remove_game(db, fourth_id)

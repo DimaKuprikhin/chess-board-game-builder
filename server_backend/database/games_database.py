@@ -2,14 +2,15 @@ import sqlite3
 
 
 def add_game(
-    db: sqlite3.Connection, user_id: int, script_id: int, link: str
+    db: sqlite3.Connection, first_player_ip: str, first_player_play_as: str,
+    script_id: int, link: str
 ) -> int:
   '''
   Adds a new entry in the database. Returns game id.
   '''
   db.execute(
-      'INSERT INTO games (user_id, script_id, link) VALUES (?, ?, ?);',
-      [user_id, script_id, link]
+      'INSERT INTO games (first_player_ip, first_player_play_as, script_id, link) VALUES (?, ?, ?, ?);',
+      [first_player_ip, first_player_play_as, script_id, link]
   )
   db.commit()
   # TODO: is there some better way to do it?
