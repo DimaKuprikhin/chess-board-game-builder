@@ -31,6 +31,11 @@ class Controller:
     )
     return True, { 'game_id': game_id, 'link': link }
 
+  def join_by_link(
+      self, db: sqlite3.Connection, link: str, second_player_ip: str
+  ) -> bool:
+    return games_database.set_second_player_ip(db, link, second_player_ip)
+
   def load_script(self, db: sqlite3.Connection, user_id: int,
                   script: str) -> Tuple[bool, Any]:
     '''
