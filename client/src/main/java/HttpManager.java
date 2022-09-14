@@ -74,6 +74,20 @@ public class HttpManager {
         return toJSON(response);
     }
 
+    public JSONObject joinGame(String link) {
+        URI uri = getURI("/join_by_link/");
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("link", link);
+        HttpRequest.BodyPublisher publisher = HttpRequest.BodyPublishers.ofString(
+                requestJson.toJSONString());
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(publisher).build();
+        String response = sendRequest(request);
+        if (response == null) {
+            return null;
+        }
+        return toJSON(response);
+    }
+
     public JSONObject loadScript(String script) {
         URI uri = getURI("/load_script/");
         JSONObject requestJson = new JSONObject();

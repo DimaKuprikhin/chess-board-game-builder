@@ -46,9 +46,15 @@ public class Controller {
         new CreateGameWindow(this);
     }
 
+    public void joinGame(String link) {
+        JSONObject response = httpManager.joinGame(link);
+        checkResponseStatus(response);
+    }
+
     public void onJoinGameButton() {
         // send request to join a game to server. If success,
         // `onMoveFromServer` will be called with appropriate game state.
+        new JoinGameWindow(this);
     }
 
     public void onMoveByMouse(Point from, Point to) {
