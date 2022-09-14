@@ -5,7 +5,6 @@ public class LinkWindow {
     private final String link;
 
     LinkWindow(String link) {
-        System.out.println(link);
         this.link = link;
         setupGUI(new JFrame("Код для присоединения"));
     }

@@ -98,6 +98,7 @@ public class CreateGameWindow {
                             = "Для создания игры, необходимо выбрать файл скрипта";
                     String title = "Ошибка при создании игры";
                     Utils.showError(title, message);
+                    return;
                 }
                 String playAs;
                 if (asWhiteRButton.isSelected()) {

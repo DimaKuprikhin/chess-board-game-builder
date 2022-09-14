@@ -15,8 +15,11 @@ public class Controller {
     }
 
     private boolean checkResponseStatus(JSONObject response) {
-        if (response == null
-                || response.containsKey("status") && !((boolean) response.get(
+        if (response == null) {
+            Utils.showError("Ошибка", "Проблема соединения");
+            return false;
+        }
+        if (response.containsKey("status") && !((boolean) response.get(
                 "status"))) {
             Utils.showError("Ошибка", (String) response.get("message"));
             return false;
