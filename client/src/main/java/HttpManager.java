@@ -13,14 +13,12 @@ public class HttpManager {
     private final String scheme;
     private final String host;
     private final int port;
-    private final long userId;
     private final HttpClient client;
 
     HttpManager(String scheme, String host, int port) {
         this.scheme = scheme;
         this.host = host;
         this.port = port;
-        this.userId = new Random(System.currentTimeMillis()).nextLong();
         this.client = HttpClient.newBuilder()
                                 .version(HttpClient.Version.HTTP_1_1).build();
     }
@@ -60,7 +58,6 @@ public class HttpManager {
     public JSONObject createGame(long scriptId, String playAs) {
         URI uri = getURI("/create_game/");
         JSONObject requestJson = new JSONObject();
-        requestJson.put("user_id", userId);
         requestJson.put("script_id", scriptId);
         requestJson.put("play_as", playAs);
         HttpRequest request = HttpRequest
@@ -91,12 +88,9 @@ public class HttpManager {
     public JSONObject loadScript(String script) {
         URI uri = getURI("/load_script/");
         JSONObject requestJson = new JSONObject();
-        requestJson.put("user_id", this.userId);
         requestJson.put("script", script);
-        HttpRequest request = HttpRequest
-                .newBuilder().uri(uri)
-                .POST(HttpRequest.BodyPublishers.ofString(
-                        requestJson.toJSONString())).build();
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.ofString(
+                requestJson.toJSONString())).build();
         String response = sendRequest(request);
         if (response == null) {
             return null;
