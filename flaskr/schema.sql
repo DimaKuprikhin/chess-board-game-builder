@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS games;
 
 CREATE TABLE scripts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
     module_name TEXT NOT NULL UNIQUE,
     script_path TEXT NOT NULL UNIQUE
 );

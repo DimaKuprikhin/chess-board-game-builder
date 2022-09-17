@@ -7,8 +7,7 @@ from flask import Flask
 def test_register(client: Client, app: Flask):
   response = client.post(
       '/load_script/', json={
-          'script': 'print(2)',
-          'user_id': 1
+          'script': 'print(2)'
       }
   )
   assert response.status_code == 200

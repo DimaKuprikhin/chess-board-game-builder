@@ -19,8 +19,8 @@ def load_script():
       pathlib.PosixPath(current_app.config['SCRIPTS_DIR'])
   )
   status, result = controller.load_script(
-      db.get_db(), request_json['user_id'], request_json['script']
+      db.get_db(), request_json['script']
   )
   if status:
-    return json.dumps({ 'script_id': result })
+    return json.dumps({ 'status': True, 'script_id': result })
   return json.dumps({ 'status': False, 'message': result })

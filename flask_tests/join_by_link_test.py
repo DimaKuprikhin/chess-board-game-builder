@@ -8,8 +8,7 @@ def test_register(client: Client, app: Flask):
   script = open('./server_backend/test_data/chess_rules.py').read()
   response = client.post(
       '/load_script/', json={
-          'script': script,
-          'user_id': 1
+          'script': script
       }
   )
   assert response.status_code == 200

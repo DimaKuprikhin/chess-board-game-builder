@@ -14,14 +14,14 @@ class TestContoller:
   def test_load_script(self, tmp_path: pathlib.PosixPath):
     controller = Controller('', tmp_path)
     db = self._get_db()
-    status, script_id = controller.load_script(db, 1, '')
+    status, script_id = controller.load_script(db, '')
     assert status
     assert isinstance(script_id, int)
 
   def test_create_game(self, tmp_path: pathlib.PosixPath):
     controller = Controller('', tmp_path)
     db = self._get_db()
-    status, script_id = controller.load_script(db, 1, '')
+    status, script_id = controller.load_script(db, '')
     assert status
     assert isinstance(script_id, int)
     game = GameDTO(
@@ -45,7 +45,7 @@ class TestContoller:
     db = self._get_db()
     script = 'def get_starting_state():\n'
     script += '  return 3'
-    status, script_id = controller.load_script(db, 1, script)
+    status, script_id = controller.load_script(db, script)
     assert status
     game = GameDTO(
         first_player_ip='1',

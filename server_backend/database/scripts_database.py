@@ -5,19 +5,19 @@ from server_backend.common import utils
 
 
 def add_script(
-    db: sqlite3.Connection, user_id: int, script: str, base_module_name: str,
+    db: sqlite3.Connection, script: str, base_module_name: str,
     scripts_dir: pathlib.PosixPath
 ) -> int:
   '''
   Adds user script to scripts table, creates a unique module name and
   a file in `scripts_dir`. On success, returns script id of the added script.
   '''
-  script_name = utils.generate_unique_string(3)
+  script_name = utils.generate_unique_string(8)
   module_name = base_module_name + '.' + script_name
   script_path = scripts_dir.joinpath(script_name + '.py').as_posix()
   db.execute(
-      'INSERT INTO scripts (user_id, module_name, script_path) VALUES (?, ?, ?);',
-      [user_id, module_name, script_path]
+      'INSERT INTO scripts (module_name, script_path) VALUES (?, ?);',
+      [module_name, script_path]
   )
   db.commit()
   # TODO: is there some better way to do it?

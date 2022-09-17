@@ -61,8 +61,7 @@ class Controller:
     host.finish()
     return status, result
 
-  def load_script(self, db: sqlite3.Connection, user_id: int,
-                  script: str) -> Tuple[bool, Any]:
+  def load_script(self, db: sqlite3.Connection, script: str) -> Tuple[bool, Any]:
     '''
     Calls by flask frontend to check user script and save it to database, if it
     is valid. On success, returns True status and script id, which should be
@@ -72,5 +71,5 @@ class Controller:
     if not script_checker.check_script(script):
       return False, 'Script didn\'t manage to pass validation check'
     return True, scripts_database.add_script(
-        db, user_id, script, self.base_module_name, self.scripts_dir
+        db, script, self.base_module_name, self.scripts_dir
     )

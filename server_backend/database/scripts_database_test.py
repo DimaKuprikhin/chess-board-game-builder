@@ -13,10 +13,10 @@ class TestScriptsDatabase:
     return db
 
   def _add_script(
-      self, db: sqlite3.Connection, user_id: int, base_module_name: str,
+      self, db: sqlite3.Connection, base_module_name: str,
       scripts_dir: pathlib.PosixPath
   ) -> int:
-    script_id = add_script(db, user_id, '', base_module_name, scripts_dir)
+    script_id = add_script(db, '', base_module_name, scripts_dir)
     assert contains(db, script_id)
     assert isinstance(script_id, int)
     assert get_module_name(db, script_id)
@@ -38,8 +38,8 @@ class TestScriptsDatabase:
   def test_add_remove_scripts(self, tmp_path: pathlib.PosixPath):
     db = self._get_db()
     base_module_name = 'scripts'
-    first_id = self._add_script(db, 1, base_module_name, tmp_path)
-    second_id = self._add_script(db, 1, base_module_name, tmp_path)
+    first_id = self._add_script(db, base_module_name, tmp_path)
+    second_id = self._add_script(db, base_module_name, tmp_path)
     assert first_id != second_id
     self._remove_script(db, second_id)
     assert contains(db, first_id)
@@ -53,7 +53,7 @@ class TestScriptsDatabase:
     if not os.path.isdir(scripts_dir):
       os.mkdir(scripts_dir)
     db = self._get_db()
-    script_id = add_script(db, 1, 'print(1)', base_module_name, scripts_dir)
+    script_id = add_script(db, 'print(1)', base_module_name, scripts_dir)
     module_name = get_module_name(db, script_id)
     importlib.import_module(module_name)
     self._remove_script(db, script_id)
