@@ -27,5 +27,11 @@ def create_game():
   status, result = controller.create_game(db.get_db(), game)
 
   if status:
-    return json.dumps({ 'status': True, 'result': result.to_map() })
+    return json.dumps({
+        'status': True,
+        'result': {
+            'id': result.get_id(),
+            'link': result.get_link()
+        }
+    })
   return json.dumps({ 'status': False, 'message': result })
