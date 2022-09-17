@@ -23,8 +23,10 @@ def test_register(client: Client, app: Flask):
   )
   assert response.status_code == 200
   response = json.loads(response.get_data(as_text=True))
+  assert response['status']
+  response = response['result']
   link = response['link']
-  game_id = response['game_id']
+  game_id = response['id']
 
   response = client.post('/join_by_link/', json={ 'link': link })
   assert response.status_code == 200

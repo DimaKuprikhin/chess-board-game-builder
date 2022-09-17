@@ -1,4 +1,5 @@
 from server_backend.controller.controller import *
+from server_backend.database.game_dto import GameDTO
 
 
 class TestContoller:
@@ -23,10 +24,17 @@ class TestContoller:
     status, script_id = controller.load_script(db, 1, '')
     assert status
     assert isinstance(script_id, int)
-    status, result = controller.create_game(db, '1', 'white', script_id)
+    game = GameDTO(
+        first_player_ip='1',
+        first_player_plays_as='white',
+        move_number=0,
+        turn='white',
+        script_id=script_id
+    )
+    status, result = controller.create_game(db, game)
     assert status
-    assert isinstance(result['game_id'], int)
-    assert isinstance(result['link'], str)
+    assert isinstance(result.get_id(), int)
+    assert isinstance(result.get_link(), str)
 
   def test_join_by_link(self):
     controller = Controller(
@@ -39,9 +47,16 @@ class TestContoller:
     script += '  return 3'
     status, script_id = controller.load_script(db, 1, script)
     assert status
-    status, result = controller.create_game(db, '1', 'white', script_id)
-    link = result['link']
+    game = GameDTO(
+        first_player_ip='1',
+        first_player_plays_as='white',
+        move_number=0,
+        turn='white',
+        script_id=script_id
+    )
+    status, result = controller.create_game(db, game)
     assert status
+    link = result.get_link()
     status, result = controller.join_by_link(db, link, '127.0.0.1')
     assert status
     assert result == 3

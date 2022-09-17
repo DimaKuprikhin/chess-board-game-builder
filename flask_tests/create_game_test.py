@@ -21,9 +21,11 @@ def test_register(client: Client, app: Flask):
   )
   assert response.status_code == 200
   result = json.loads(response.get_data(as_text=True))
-  assert isinstance(result['game_id'], int)
+  assert result['status']
+  result = result['result']
+  assert isinstance(result['id'], int)
   assert isinstance(result['link'], str)
   with app.app_context():
     assert get_db().execute(
         'SELECT id FROM games WHERE first_player_ip == "127.0.0.1";'
-    ).fetchone()['id'] == result['game_id']
+    ).fetchone()['id'] == result['id']

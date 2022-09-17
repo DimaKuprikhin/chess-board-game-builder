@@ -12,7 +12,10 @@ CREATE TABLE games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_player_ip TEXT NOT NULL,
     second_player_ip TEXT,
-    first_player_play_as TEXT NOT NULL CHECK (first_player_play_as = 'white' OR first_player_play_as = 'black'),
+    first_player_plays_as TEXT NOT NULL CHECK (first_player_plays_as == 'white' OR first_player_plays_as == 'black'),
+    move_number INTEGER NOT NULL,
+    turn TEXT NOT NULL CHECK (turn == 'white' OR turn == 'black'),
     script_id INTEGER NOT NULL,
-    link TEXT NOT NULL UNIQUE
+    link TEXT NOT NULL UNIQUE,
+    additional_data TEXT
 );

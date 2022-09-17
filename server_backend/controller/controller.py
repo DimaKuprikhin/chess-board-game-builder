@@ -1,5 +1,6 @@
 import pathlib
 import sqlite3
+from server_backend.database import game_dto
 from server_backend.database import games_database
 from server_backend.database import scripts_database
 from server_backend.executer import executer_host
@@ -19,10 +20,8 @@ class Controller:
     self.scripts_dir = scripts_dir
     self.init_by_test = init_by_test
 
-  def create_game(
-      self, db: sqlite3.Connection, first_player_ip: str,
-      first_player_play_as: str, script_id: int
-  ) -> Tuple[bool, Any]:
+  def create_game(self, db: sqlite3.Connection,
+                  game: game_dto.GameDTO) -> Tuple[bool, Any]:
     '''
     Creates a game that uses script with the given script id. Script id must be
     a result of previously called `load_script`. If scripts database doesn't
@@ -30,31 +29,37 @@ class Controller:
     message. Otherwise, returns True and `game_id` that must be used for futher
     requests.
     '''
-    if not scripts_database.contains(db, script_id):
-      return False, 'There is no script with this script id: ' + str(script_id)
-    link = utils.generate_unique_string(8)
-    game_id = games_database.add_game(
-        db, first_player_ip, first_player_play_as, script_id, link
+    if not scripts_database.contains(db, game.get_script_id()):
+      return False, 'There is no script with this script id: ' + str(
+          game.get_script_id()
+      )
+    game_id = games_database.add_entry(
+        db, game.set_link(utils.generate_unique_string(8))
     )
-    return True, { 'game_id': game_id, 'link': link }
+    return True, games_database.get_entry(db, game_id)
 
   def join_by_link(
       self, db: sqlite3.Connection, link: str, second_player_ip: str
   ) -> Tuple[bool, Any]:
-    status, game_id = games_database.set_second_player_ip(
-        db, link, second_player_ip
+    game = games_database.get_entries_by_predicate(
+        db, 'link == ? AND second_player_ip IS NULL', [link]
     )
-    if status:
-      script_id = games_database.get_script_id(db, game_id)
-      module_name = scripts_database.get_module_name(db, script_id)
-      host = executer_host.ExecuterHost(self.init_by_test)
-      host.create_executer()
-      status, result = host.call_script_function(
-          module_name, 'get_starting_state', [], 0.1
-      )
-      host.finish()
-      return status, result
-    return False, 'Couldn\'t join to the game'
+    if len(game) == 0:
+      return False, 'There is no game to which you can join by link ' + link
+    game = game[0]
+
+    games_database.update_entry(
+        db, game.set_second_player_ip(second_player_ip)
+    )
+    script_id = game.get_script_id()
+    module_name = scripts_database.get_module_name(db, script_id)
+    host = executer_host.ExecuterHost(self.init_by_test)
+    host.create_executer()
+    status, result = host.call_script_function(
+        module_name, 'get_starting_state', [], 0.1
+    )
+    host.finish()
+    return status, result
 
   def load_script(self, db: sqlite3.Connection, user_id: int,
                   script: str) -> Tuple[bool, Any]:
@@ -65,7 +70,7 @@ class Controller:
     message.
     '''
     if not script_checker.check_script(script):
-      return False, 'Script didn\'t manage to pass security check'
+      return False, 'Script didn\'t manage to pass validation check'
     return True, scripts_database.add_script(
         db, user_id, script, self.base_module_name, self.scripts_dir
     )

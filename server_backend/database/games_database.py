@@ -1,17 +1,32 @@
 import sqlite3
-from typing import Any, Tuple
+from server_backend.database.game_dto import GameDTO
 
 
-def add_game(
-    db: sqlite3.Connection, first_player_ip: str, first_player_play_as: str,
-    script_id: int, link: str
-) -> int:
+def add_entry(db: sqlite3.Connection, entry: GameDTO) -> int:
   '''
-  Adds a new entry in the database. Returns game id.
+  Adds a new entry in the database. Returns inserted game id. Game id is
+  autoincremented, so `entry.id` of this entry is ignored in this method.
   '''
   db.execute(
-      'INSERT INTO games (first_player_ip, first_player_play_as, script_id, link) VALUES (?, ?, ?, ?);',
-      [first_player_ip, first_player_play_as, script_id, link]
+      'INSERT INTO games (\
+        first_player_ip, \
+        second_player_ip, \
+        first_player_plays_as, \
+        move_number, \
+        turn, \
+        script_id, \
+        link, \
+        additional_data\
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);', [
+          entry.get_first_player_ip(),
+          entry.get_second_player_ip(),
+          entry.get_first_player_plays_as(),
+          entry.get_move_number(),
+          entry.get_turn(),
+          entry.get_script_id(),
+          entry.get_link(),
+          entry.get_additional_data()
+      ]
   )
   db.commit()
   # TODO: is there some better way to do it?
@@ -19,51 +34,67 @@ def add_game(
                     ).fetchone()['id']
 
 
-def set_second_player_ip(
-    db: sqlite3.Connection, link: str, second_player_ip: str
-) -> Tuple[bool, Any]:
+def get_entries_by_predicate(
+    db: sqlite3.Connection, predicate: str, params: list
+) -> list:
   '''
-  Sets value of `second_player_ip` field in entry with appropriate link. If
-  there is no such a link in the database or `second_player_ip` is already
-  set, returns False.
+  Returns list of the database entries that satisfied given `predicate`.
   '''
-  result = db.execute(
-      'SELECT id FROM games WHERE second_player_ip IS NULL AND link == ?',
-      [link]
+  db_entries = db.execute(
+      'SELECT \
+        id, \
+        first_player_ip, \
+        second_player_ip, \
+        first_player_plays_as, \
+        move_number, \
+        turn, \
+        script_id, \
+        link, \
+        additional_data \
+      FROM games WHERE ' + predicate + ';', params
+  ).fetchall()
+  entries = []
+  for db_entry in db_entries:
+    entries.append(
+        GameDTO(
+            db_entry['id'], db_entry['first_player_ip'],
+            db_entry['second_player_ip'], db_entry['first_player_plays_as'],
+            db_entry['move_number'], db_entry['turn'], db_entry['script_id'],
+            db_entry['link'], db_entry['additional_data']
+        )
+    )
+  return entries
+
+
+def get_entry(db: sqlite3.Connection, id: int) -> GameDTO:
+  '''
+  Returns database entry with id equal to the given `id`. If the database
+  doesn't have an entry with this id, returns None.
+  '''
+  db_entry = db.execute(
+      'SELECT \
+        id, \
+        first_player_ip, \
+        second_player_ip, \
+        first_player_plays_as, \
+        move_number, \
+        turn, \
+        script_id, \
+        link, \
+        additional_data \
+      FROM games WHERE id == ?;', [id]
   ).fetchone()
-  if result is None:
-    return False, None
-  db.execute(
-      'UPDATE games SET second_player_ip = ? WHERE id == ?',
-      [second_player_ip, result['id']]
+  if db_entry is None:
+    return None
+  return GameDTO(
+      db_entry['id'], db_entry['first_player_ip'],
+      db_entry['second_player_ip'], db_entry['first_player_plays_as'],
+      db_entry['move_number'], db_entry['turn'], db_entry['script_id'],
+      db_entry['link'], db_entry['additional_data']
   )
-  db.commit()
-  return True, result['id']
 
 
-def get_first_player_ip(db: sqlite3.Connection, game_id: int) -> str:
-  return db.execute(
-      'SELECT first_player_ip FROM games WHERE id == ?;', [game_id]
-  ).fetchone()
-
-
-def get_second_player_ip(db: sqlite3.Connection, game_id: int) -> str:
-  return db.execute(
-      'SELECT second_palyer_ip FROM games WHERE id == ?;', [game_id]
-  ).fetchone()
-
-
-def get_script_id(db: sqlite3.Connection, game_id: int) -> int:
-  '''
-  Returns script id of the entry with the giver game id. If the database
-  doesn't contain an entry with this game id, returns None.
-  '''
-  result = db.execute('SELECT script_id FROM games WHERE id == ?;',
-                      [game_id]).fetchone()
-  return None if result is None else result['script_id']
-
-
-def remove_game(db: sqlite3.Connection, game_id: int) -> bool:
+def remove_entry(db: sqlite3.Connection, game_id: int) -> bool:
   '''
   Removes an entry with the given game id from the database. If the database
   doesn't contain an entry with this game id, returns False and doesn't
@@ -76,3 +107,34 @@ def remove_game(db: sqlite3.Connection, game_id: int) -> bool:
   db.execute('DELETE FROM games WHERE id == ?;', [game_id])
   db.commit()
   return True
+
+
+def update_entry(db: sqlite3.Connection, entry: GameDTO):
+  '''
+  Updates field of the database row with id equal to `entry.get_id()`.
+  Field values of the row will be set to corresponding values from `entry`.
+  If the database doesn't contain an entry with this id, nothing is changed.
+  '''
+  db.execute(
+      'UPDATE games SET (\
+        first_player_ip, \
+        second_player_ip, \
+        first_player_plays_as, \
+        move_number, \
+        turn, \
+        script_id, \
+        link, \
+        additional_data\
+      ) = (?, ?, ?, ?, ?, ?, ?, ?) WHERE id == ?;', [
+          entry.get_first_player_ip(),
+          entry.get_second_player_ip(),
+          entry.get_first_player_plays_as(),
+          entry.get_move_number(),
+          entry.get_turn(),
+          entry.get_script_id(),
+          entry.get_link(),
+          entry.get_additional_data(),
+          entry.get_id()
+      ]
+  )
+  db.commit()
