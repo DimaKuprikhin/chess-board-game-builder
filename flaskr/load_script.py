@@ -22,5 +22,5 @@ def load_script():
       db.get_db(), request_json['script']
   )
   if status:
-    return json.dumps({ 'status': True, 'script_id': result })
-  return json.dumps({ 'status': False, 'message': result })
+    return json.dumps({ 'status': True, 'result': { 'script_id': result } })
+  return json.dumps({ 'status': False, 'result': result })

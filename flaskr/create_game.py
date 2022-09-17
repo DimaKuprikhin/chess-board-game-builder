@@ -34,4 +34,4 @@ def create_game():
             'link': result.get_link()
         }
     })
-  return json.dumps({ 'status': False, 'message': result })
+  return json.dumps({ 'status': False, 'result': result })
