@@ -65,6 +65,9 @@ class ExecuterHost:
       return False, 'No response from executer'
     return executer_utils.deserialize_response(response)
 
+  def finish(self):
+    self.executer.stdin.close()
+
   def has_executer(self) -> bool:
     '''
     Returns true if `create_executer()` method was called earlier and finished

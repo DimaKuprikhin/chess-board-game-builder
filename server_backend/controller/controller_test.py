@@ -28,13 +28,24 @@ class TestContoller:
     assert isinstance(result['game_id'], int)
     assert isinstance(result['link'], str)
 
-  def test_join_by_link(self, tmp_path: pathlib.PosixPath):
-    controller = Controller('', tmp_path)
+  def test_join_by_link(self):
+    controller = Controller(
+        'server_backend.test_data.scripts_dir',
+        pathlib.PosixPath('.', 'server_backend', 'test_data', 'scripts_dir'),
+        True
+    )
     db = self._get_db()
-    status, script_id = controller.load_script(db, 1, '')
+    script = 'def get_starting_state():\n'
+    script += '  return 3'
+    status, script_id = controller.load_script(db, 1, script)
     assert status
     status, result = controller.create_game(db, '1', 'white', script_id)
+    link = result['link']
     assert status
-    assert controller.join_by_link(db, result['link'], '127.0.0.1')
-    assert not controller.join_by_link(db, result['link'], '127.0.0.1')
-    assert not controller.join_by_link(db, 'link', '127.0.0.1')
+    status, result = controller.join_by_link(db, link, '127.0.0.1')
+    assert status
+    assert result == 3
+    status, result = controller.join_by_link(db, link, '127.0.0.1')
+    assert not status
+    status, result = controller.join_by_link(db, 'link', '127.0.0.1')
+    assert not status

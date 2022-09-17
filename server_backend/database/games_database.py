@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Any, Tuple
 
 
 def add_game(
@@ -20,7 +21,7 @@ def add_game(
 
 def set_second_player_ip(
     db: sqlite3.Connection, link: str, second_player_ip: str
-) -> bool:
+) -> Tuple[bool, Any]:
   '''
   Sets value of `second_player_ip` field in entry with appropriate link. If
   there is no such a link in the database or `second_player_ip` is already
@@ -31,13 +32,25 @@ def set_second_player_ip(
       [link]
   ).fetchone()
   if result is None:
-    return False
+    return False, None
   db.execute(
       'UPDATE games SET second_player_ip = ? WHERE id == ?',
       [second_player_ip, result['id']]
   )
   db.commit()
-  return True
+  return True, result['id']
+
+
+def get_first_player_ip(db: sqlite3.Connection, game_id: int) -> str:
+  return db.execute(
+      'SELECT first_player_ip FROM games WHERE id == ?;', [game_id]
+  ).fetchone()
+
+
+def get_second_player_ip(db: sqlite3.Connection, game_id: int) -> str:
+  return db.execute(
+      'SELECT second_palyer_ip FROM games WHERE id == ?;', [game_id]
+  ).fetchone()
 
 
 def get_script_id(db: sqlite3.Connection, game_id: int) -> int:

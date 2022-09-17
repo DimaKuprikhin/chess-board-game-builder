@@ -1,6 +1,6 @@
 import json
 import pathlib
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from flaskr import db, utils
 from server_backend.controller.controller import Controller
 
@@ -17,8 +17,11 @@ def join_by_link():
       request.get_data(cache=False, as_text=True, parse_form_data=False)
   )
 
-  controller = Controller('scripts', pathlib.PosixPath('.', 'scripts'))
+  controller = Controller(
+      'scripts', pathlib.PosixPath('.', 'scripts'),
+      current_app.config.get('INIT_BY_TEST', False)
+  )
   second_player_ip = utils.get_user_ip(request)
   link = request_json['link']
-  result = controller.join_by_link(db.get_db(), link, second_player_ip)
-  return { 'status': result }
+  status, result = controller.join_by_link(db.get_db(), link, second_player_ip)
+  return { 'status': status, 'result': result }

@@ -16,6 +16,7 @@ def app():
       'DATABASE': db_path,
       'SCRIPTS_DIR': scripts_dir,
       'BASE_MODULE_NAME': base_module_name,
+      'INIT_BY_TEST': True
   })
   with app.app_context():
     init_db()

@@ -50,6 +50,12 @@ class TestGamesDatabase:
   def test_set_second_player_ip(self):
     db = self._get_db()
     game_id = self._add_game(db, '1', 'white', 100, 'unique_link')
-    assert set_second_player_ip(db, 'unique_link', '2')
-    assert not set_second_player_ip(db, 'unique_link', '3')
-    assert not set_second_player_ip(db, 'missing_link', '4')
+    status, game_id = set_second_player_ip(db, 'unique_link', '2')
+    assert status
+    assert isinstance(game_id, int)
+    status, game_id = set_second_player_ip(db, 'unique_link', '3')
+    assert not status
+    assert game_id is None
+    status, game_id = set_second_player_ip(db, 'missing_link', '4')
+    assert not status
+    assert game_id is None
