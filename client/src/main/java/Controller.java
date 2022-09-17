@@ -21,7 +21,7 @@ public class Controller {
         }
         if (response.containsKey("status") && !((boolean) response.get(
                 "status"))) {
-            Utils.showError("Ошибка", (String) response.get("message"));
+            Utils.showError("Ошибка", (String) response.get("result"));
             return false;
         }
         return true;
@@ -34,10 +34,11 @@ public class Controller {
         if (!checkResponseStatus(response)) {
             return;
         }
-        response = httpManager.createGame((long) response.get("script_id"),
-                                          playAs);
+        JSONObject result = (JSONObject) response.get("result");
+        response = httpManager.createGame((long) result.get("script_id"), playAs);
         if (checkResponseStatus(response)) {
-            new LinkWindow((String) response.get("link"));
+            result = (JSONObject) response.get("result");
+            new LinkWindow((String) result.get("link"));
         }
     }
 
@@ -48,7 +49,12 @@ public class Controller {
 
     public void joinGame(String link) {
         JSONObject response = httpManager.joinGame(link);
-        checkResponseStatus(response);
+        if (!checkResponseStatus(response)) {
+            return;
+        }
+        GameState gameState = GameState.fromJSON((JSONObject) response.get("result"));
+//        Color color = ((String) response.get("color")).equals("white") ? Color.WHITE : Color.BLACK;
+        boardPanel.updateBoard(gameState, Color.WHITE, Color.WHITE);
     }
 
     public void onJoinGameButton() {

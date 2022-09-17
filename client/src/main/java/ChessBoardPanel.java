@@ -9,6 +9,9 @@ import java.util.Map;
 public class ChessBoardPanel extends JPanel {
     private final Map<String, Image> images;
     private ArrayList<Piece> pieces;
+    private ArrayList<Move> possibleMoves = new ArrayList<>();
+    private Color playerColor = null;
+    private Color turn = null;
     private Piece selectedPiece = null;
     private Point selectedPiecePosition = null;
 
@@ -68,6 +71,14 @@ public class ChessBoardPanel extends JPanel {
         return new Dimension(s, s);
     }
 
+    public void updateBoard(GameState gameState, Color playerColor, Color turn) {
+        this.pieces = gameState.pieces;
+        this.possibleMoves = gameState.possibleMoves;
+        this.playerColor = playerColor;
+        this.turn = turn;
+        this.repaint();
+    }
+
     private Point getCellByPosition(int x, int y) {
         return new Point(x / (getSize().width / 8), y / (getSize().height / 8));
     }
@@ -111,9 +122,18 @@ public class ChessBoardPanel extends JPanel {
                 if (selectedPiece == null) {
                     return;
                 }
+                if (playerColor != turn || selectedPiece.color != turn) {
+                    selectedPiece = null;
+                    selectedPiecePosition = null;
+                    thisPanel.repaint();
+                    return;
+                }
                 Point releaseCell = getCellByPosition(e.getX(), e.getY());
-                if (releaseCell.x >= 0 && releaseCell.x < 8
-                        || releaseCell.y >= 0 && releaseCell.y < 8) {
+                Move move = new Move(new Point(selectedPiece.getX(), selectedPiece.getY()),
+                                     releaseCell);
+                if (possibleMoves.contains(move)
+                        && releaseCell.x >= 0 && releaseCell.x < 8
+                        && releaseCell.y >= 0 && releaseCell.y < 8) {
                     int pieceIndex = pieces.indexOf(
                             new Piece("", null, releaseCell.x, releaseCell.y));
                     if (pieceIndex != -1) {

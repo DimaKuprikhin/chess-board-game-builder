@@ -50,4 +50,14 @@ public class Utils {
     public static int randomInt(int bound) {
         return rnd.nextInt(bound);
     }
+
+    public static Color fromString(String color) {
+        if (color.equals("white")) {
+            return Color.WHITE;
+        }
+        if (color.equals("black")) {
+            return Color.BLACK;
+        }
+        return null;
+    }
 }
