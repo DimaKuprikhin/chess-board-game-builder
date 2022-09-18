@@ -34,9 +34,10 @@ public class Move {
         if (other == null) {
             return false;
         }
-        if (!(other instanceof Move otherMove)) {
+        if (!(other instanceof Move)) {
             return false;
         }
+        Move otherMove = (Move) other;
         return from.x == otherMove.from.x && from.y == otherMove.from.y
                 && to.x == otherMove.to.x && to.y == otherMove.to.y;
     }

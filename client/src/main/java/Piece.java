@@ -42,9 +42,10 @@ public class Piece {
         if (other == null) {
             return false;
         }
-        if (!(other instanceof Piece otherPiece)) {
+        if (!(other instanceof Piece)) {
             return false;
         }
+        Piece otherPiece = (Piece) other;
         return x == otherPiece.x && y == otherPiece.y;
     }
 }
