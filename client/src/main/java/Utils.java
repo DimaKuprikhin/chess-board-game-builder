@@ -2,10 +2,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +12,13 @@ public class Utils {
     private static final Random rnd = new Random();
 
     public static Map<String, Image> getPieceImages() {
-        BufferedImage all;
-        try {
-            all = ImageIO.read(new File("resources/chess.png"));
-        } catch (IOException ex) {
-            System.out.println("Can't read chess pieces image file.");
-            return new HashMap<>();
+        BufferedImage all = null;
+        try (InputStream stream = Utils.class.getResourceAsStream("chess.png")) {
+            assert stream != null;
+            all = ImageIO.read(stream);
+        } catch (Exception ex) {
+            Utils.showError("Ошибка", "Не удалось прочитать файл изображений.");
+            System.exit(1);
         }
         HashMap<String, Image> pieceImages = new HashMap<>();
         final String[] pieceNames = { "king", "queen", "bishop", "knight",
