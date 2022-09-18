@@ -1,3 +1,4 @@
+import json
 import pathlib
 import sqlite3
 from server_backend.database import game_dto
@@ -39,17 +40,17 @@ class Controller:
     return True, games_database.get_entry(db, game_id)
 
   def join_by_link(
-      self, db: sqlite3.Connection, link: str, second_player_ip: str
+      self, db: sqlite3.Connection, link: str, second_player_id: str
   ) -> Tuple[bool, Any]:
     game = games_database.get_entries_by_predicate(
-        db, 'link == ? AND second_player_ip IS NULL', [link]
+        db, 'link == ? AND second_player_id IS NULL', [link]
     )
     if len(game) == 0:
       return False, 'There is no game to which you can join by link ' + link
     game = game[0]
 
     games_database.update_entry(
-        db, game.set_second_player_ip(second_player_ip)
+        db, game.set_second_player_id(second_player_id)
     )
     script_id = game.get_script_id()
     module_name = scripts_database.get_module_name(db, script_id)
@@ -59,9 +60,12 @@ class Controller:
         module_name, 'get_starting_state', [], 0.1
     )
     host.finish()
-    return status, result
+    if status:
+      games_database.update_entry(db, game.set_game_state(json.dumps(result)))
+    return status, { 'game_state': result, 'game_id': game.get_id() }
 
-  def load_script(self, db: sqlite3.Connection, script: str) -> Tuple[bool, Any]:
+  def load_script(self, db: sqlite3.Connection,
+                  script: str) -> Tuple[bool, Any]:
     '''
     Calls by flask frontend to check user script and save it to database, if it
     is valid. On success, returns True status and script id, which should be

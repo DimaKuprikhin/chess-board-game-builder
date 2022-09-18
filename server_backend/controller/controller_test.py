@@ -25,7 +25,7 @@ class TestContoller:
     assert status
     assert isinstance(script_id, int)
     game = GameDTO(
-        first_player_ip='1',
+        first_player_id='1',
         first_player_plays_as='white',
         move_number=0,
         turn='white',
@@ -48,7 +48,7 @@ class TestContoller:
     status, script_id = controller.load_script(db, script)
     assert status
     game = GameDTO(
-        first_player_ip='1',
+        first_player_id=1,
         first_player_plays_as='white',
         move_number=0,
         turn='white',
@@ -59,7 +59,8 @@ class TestContoller:
     link = result.get_link()
     status, result = controller.join_by_link(db, link, '127.0.0.1')
     assert status
-    assert result == 3
+    assert result['game_state'] == 3
+    assert isinstance(result['game_id'], int)
     status, result = controller.join_by_link(db, link, '127.0.0.1')
     assert not status
     status, result = controller.join_by_link(db, 'link', '127.0.0.1')

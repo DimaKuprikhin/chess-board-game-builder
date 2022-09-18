@@ -21,7 +21,17 @@ def join_by_link():
       'scripts', pathlib.PosixPath('.', 'scripts'),
       current_app.config.get('INIT_BY_TEST', False)
   )
-  second_player_ip = utils.get_user_ip(request)
+  second_player_id = request_json['user_id']
   link = request_json['link']
-  status, result = controller.join_by_link(db.get_db(), link, second_player_ip)
+
+  status, result = controller.join_by_link(db.get_db(), link, second_player_id)
+
+  if status:
+    return {
+        'status': status,
+        'result': {
+            'game_id': result['game_id'],
+            'game_state': result['game_state']
+        }
+    }
   return { 'status': status, 'result': result }

@@ -9,22 +9,24 @@ def add_entry(db: sqlite3.Connection, entry: GameDTO) -> int:
   '''
   db.execute(
       'INSERT INTO games (\
-        first_player_ip, \
-        second_player_ip, \
+        first_player_id, \
+        second_player_id, \
         first_player_plays_as, \
         move_number, \
         turn, \
         script_id, \
         link, \
+        game_state, \
         additional_data\
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);', [
-          entry.get_first_player_ip(),
-          entry.get_second_player_ip(),
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);', [
+          entry.get_first_player_id(),
+          entry.get_second_player_id(),
           entry.get_first_player_plays_as(),
           entry.get_move_number(),
           entry.get_turn(),
           entry.get_script_id(),
           entry.get_link(),
+          entry.get_game_state(),
           entry.get_additional_data()
       ]
   )
@@ -43,13 +45,14 @@ def get_entries_by_predicate(
   db_entries = db.execute(
       'SELECT \
         id, \
-        first_player_ip, \
-        second_player_ip, \
+        first_player_id, \
+        second_player_id, \
         first_player_plays_as, \
         move_number, \
         turn, \
         script_id, \
         link, \
+        game_state, \
         additional_data \
       FROM games WHERE ' + predicate + ';', params
   ).fetchall()
@@ -57,10 +60,11 @@ def get_entries_by_predicate(
   for db_entry in db_entries:
     entries.append(
         GameDTO(
-            db_entry['id'], db_entry['first_player_ip'],
-            db_entry['second_player_ip'], db_entry['first_player_plays_as'],
+            db_entry['id'], db_entry['first_player_id'],
+            db_entry['second_player_id'], db_entry['first_player_plays_as'],
             db_entry['move_number'], db_entry['turn'], db_entry['script_id'],
-            db_entry['link'], db_entry['additional_data']
+            db_entry['link'], db_entry['game_state'],
+            db_entry['additional_data']
         )
     )
   return entries
@@ -74,23 +78,24 @@ def get_entry(db: sqlite3.Connection, id: int) -> GameDTO:
   db_entry = db.execute(
       'SELECT \
         id, \
-        first_player_ip, \
-        second_player_ip, \
+        first_player_id, \
+        second_player_id, \
         first_player_plays_as, \
         move_number, \
         turn, \
         script_id, \
         link, \
+        game_state, \
         additional_data \
       FROM games WHERE id == ?;', [id]
   ).fetchone()
   if db_entry is None:
     return None
   return GameDTO(
-      db_entry['id'], db_entry['first_player_ip'],
-      db_entry['second_player_ip'], db_entry['first_player_plays_as'],
+      db_entry['id'], db_entry['first_player_id'],
+      db_entry['second_player_id'], db_entry['first_player_plays_as'],
       db_entry['move_number'], db_entry['turn'], db_entry['script_id'],
-      db_entry['link'], db_entry['additional_data']
+      db_entry['link'], db_entry['game_state'], db_entry['additional_data']
   )
 
 
@@ -117,22 +122,24 @@ def update_entry(db: sqlite3.Connection, entry: GameDTO):
   '''
   db.execute(
       'UPDATE games SET (\
-        first_player_ip, \
-        second_player_ip, \
+        first_player_id, \
+        second_player_id, \
         first_player_plays_as, \
         move_number, \
         turn, \
         script_id, \
         link, \
+        game_state, \
         additional_data\
-      ) = (?, ?, ?, ?, ?, ?, ?, ?) WHERE id == ?;', [
-          entry.get_first_player_ip(),
-          entry.get_second_player_ip(),
+      ) = (?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE id == ?;', [
+          entry.get_first_player_id(),
+          entry.get_second_player_id(),
           entry.get_first_player_plays_as(),
           entry.get_move_number(),
           entry.get_turn(),
           entry.get_script_id(),
           entry.get_link(),
+          entry.get_game_state(),
           entry.get_additional_data(),
           entry.get_id()
       ]

@@ -18,12 +18,13 @@ def create_game():
 
   controller = Controller('scripts', pathlib.PosixPath('.', 'scripts'))
   game = GameDTO(
-      first_player_ip=utils.get_user_ip(request),
+      first_player_id=request_json['user_id'],
       first_player_plays_as=request_json['play_as'],
       move_number=0,
       turn='white',
       script_id=request_json['script_id']
   )
+
   status, result = controller.create_game(db.get_db(), game)
 
   if status:

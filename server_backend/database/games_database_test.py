@@ -36,7 +36,7 @@ class TestGamesDatabase:
     self._add_entry(
         db,
         GameDTO(
-            first_player_ip='1',
+            first_player_id=1,
             first_player_plays_as='white',
             move_number=0,
             turn='white',
@@ -47,7 +47,7 @@ class TestGamesDatabase:
     self._add_entry(
         db,
         GameDTO(
-            first_player_ip='2',
+            first_player_id=1,
             first_player_plays_as='black',
             move_number=1,
             turn='black',
@@ -58,7 +58,7 @@ class TestGamesDatabase:
     self._add_entry(
         db,
         GameDTO(
-            first_player_ip='1',
+            first_player_id=1,
             first_player_plays_as='white',
             move_number=2,
             turn='white',
@@ -72,7 +72,7 @@ class TestGamesDatabase:
     first_id = self._add_entry(
         db,
         GameDTO(
-            first_player_ip='1',
+            first_player_id=1,
             first_player_plays_as='black',
             move_number=3,
             turn='black',
@@ -84,7 +84,7 @@ class TestGamesDatabase:
     second_id = self._add_entry(
         db,
         GameDTO(
-            first_player_ip='1',
+            first_player_id=1,
             first_player_plays_as='white',
             move_number=4,
             turn='white',
@@ -95,7 +95,7 @@ class TestGamesDatabase:
     third_id = self._add_entry(
         db,
         GameDTO(
-            first_player_ip='2',
+            first_player_id=2,
             first_player_plays_as='white',
             move_number=5,
             turn='black',
@@ -106,7 +106,7 @@ class TestGamesDatabase:
     fourth_id = self._add_entry(
         db,
         GameDTO(
-            first_player_ip='2',
+            first_player_id=2,
             first_player_plays_as='black',
             move_number=5,
             turn='white',
@@ -121,7 +121,7 @@ class TestGamesDatabase:
   def test_update_entry(self):
     db = self._get_db()
     entry = GameDTO(
-        first_player_ip='1',
+        first_player_id=1,
         first_player_plays_as='white',
         move_number=6,
         turn='black',

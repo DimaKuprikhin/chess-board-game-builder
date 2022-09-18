@@ -7,15 +7,19 @@ from flask import Flask
 def test_register(client: Client, app: Flask):
   response = client.post(
       '/load_script/', json={
-          'script': 'print(2)'
+          'script': 'print(2)',
+          'user_id': 1
       }
   )
   assert response.status_code == 200
-  script_id = json.loads(response.get_data(as_text=True))['script_id']
+  script_id = json.loads(response.get_data(as_text=True)
+                         )['result']['script_id']
   response = client.post(
-      '/create_game/', json={
+      '/create_game/',
+      json={
           'script_id': script_id,
-          'play_as': 'white'
+          'play_as': 'white',
+          'user_id': 1
       }
   )
   assert response.status_code == 200
@@ -26,5 +30,5 @@ def test_register(client: Client, app: Flask):
   assert isinstance(result['link'], str)
   with app.app_context():
     assert get_db().execute(
-        'SELECT id FROM games WHERE first_player_ip == "127.0.0.1";'
+        'SELECT id FROM games WHERE first_player_id == 1;'
     ).fetchone()['id'] == result['id']

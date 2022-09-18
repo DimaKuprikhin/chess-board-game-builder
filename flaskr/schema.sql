@@ -9,12 +9,13 @@ CREATE TABLE scripts (
 
 CREATE TABLE games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_player_ip TEXT NOT NULL,
-    second_player_ip TEXT,
+    first_player_id INTEGER NOT NULL,
+    second_player_id INTEGER,
     first_player_plays_as TEXT NOT NULL CHECK (first_player_plays_as == 'white' OR first_player_plays_as == 'black'),
     move_number INTEGER NOT NULL,
     turn TEXT NOT NULL CHECK (turn == 'white' OR turn == 'black'),
     script_id INTEGER NOT NULL,
     link TEXT NOT NULL UNIQUE,
+    game_state TEXT,
     additional_data TEXT
 );
