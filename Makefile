@@ -7,18 +7,20 @@ TEST_SCRIPTS_DIR=scripts_dir
 
 clean:
 	@find ./ -type d -name ${PYCACHE} -prune -exec rm -rf {} \;
-	@find ./server_backend/test_data -type d -name ${TEST_SCRIPTS_DIR} -prune -exec rm -rf {} \;
+	@rm -rf ./server_backend/test_data/${TEST_SCRIPTS_DIR}/*
 	@find ./ -type d -name ${PYTEST_CACHE} -prune -exec rm -rf {} \;
 	@find ./ -type d -name ${PYCACHE} -exec rmdir {} \;
-	@find ./server_backend/test_data -type d -name ${TEST_SCRIPTS_DIR} -exec rmdir {} \;
 	@find ./ -type d -name ${PYTEST_CACHE} -exec rmdir {} \;
 
 format:
 	@yapf3 --in-place ./*.py
 	@yapf3 --in-place ./flask_tests/*.py
 	@yapf3 --in-place ./flaskr/*.py
-	@yapf3 --in-place ./server_backend/*.py
-	@yapf3 --in-place ./server_backend/*/*.py
+	@yapf3 --in-place ./server_backend/common/*.py
+	@yapf3 --in-place ./server_backend/controller/*.py
+	@yapf3 --in-place ./server_backend/database/*.py
+	@yapf3 --in-place ./server_backend/executer/*.py
+	@yapf3 --in-place ./server_backend/script_checker/*.py
 
 init:
 	@flask --app flaskr init-db
