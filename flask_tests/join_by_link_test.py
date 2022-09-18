@@ -35,6 +35,9 @@ def test_register(client: Client, app: Flask):
   assert response.status_code == 200
   response = json.loads(response.get_data(as_text=True))
   assert response['status']
+  result = response['result']
+  assert result['color'] == 'black'
+  assert result['turn'] == 'white'
   with app.app_context():
     query_result = get_db().execute(
         'SELECT first_player_id, second_player_id FROM games WHERE id == ?;',

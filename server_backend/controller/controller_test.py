@@ -60,6 +60,8 @@ class TestContoller:
     status, result = controller.join_by_link(db, link, 2)
     assert status
     assert result['game_state'] == 3
+    assert result['color'] == 'black'
+    assert result['turn'] == 'white'
     assert isinstance(result['game_id'], int)
     status, result = controller.join_by_link(db, link, 2)
     assert not status
@@ -102,24 +104,30 @@ class TestContoller:
 
     status, result = controller.make_move(db, game_id, 1, move)
     assert status
-    assert result['pieces'] == [{
+    game_state = result['game_state']
+    assert result['color'] == 'white'
+    assert result['turn'] == 'black'
+    assert game_state['pieces'] == [{
         'name': 'dummy',
         'color': 'white',
         'x': 0,
         'y': 1
     }]
-    assert result['possible_moves'] == []
-    assert result['additional_data'] == {}
-    assert result['status'] == 'running'
+    assert game_state['possible_moves'] == []
+    assert game_state['additional_data'] == {}
+    assert game_state['status'] == 'running'
 
-    status, result = controller.get_game_state(db, game_id)
+    status, result = controller.get_game_state(db, game_id, 2)
     assert status
-    assert result['pieces'] == [{
+    assert result['color'] == 'black'
+    assert result['turn'] == 'black'
+    game_state = result['game_state']
+    assert game_state['pieces'] == [{
         'name': 'dummy',
         'color': 'white',
         'x': 0,
         'y': 1
     }]
-    assert result['possible_moves'] == []
-    assert result['additional_data'] == {}
-    assert result['status'] == 'running'
+    assert game_state['possible_moves'] == []
+    assert game_state['additional_data'] == {}
+    assert game_state['status'] == 'running'

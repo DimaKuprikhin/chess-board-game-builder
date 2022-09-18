@@ -9,21 +9,12 @@ get_game_state_bp = Blueprint(
 )
 
 
-@get_game_state_bp.route('/<int:game_id>', methods=['GET'])
-def get_game_state(game_id: int):
+@get_game_state_bp.route('/<int:game_id>/<int:user_id>', methods=['GET'])
+def get_game_state(game_id: int, user_id: int):
   controller = Controller(
       'scripts', pathlib.PosixPath('.', 'scripts'),
       current_app.config.get('INIT_BY_TEST', False)
   )
 
-  status, result = controller.get_game_state(db.get_db(), game_id)
-
-  if status:
-    return {
-        'status': status,
-        'result': {
-            'pieces': result['pieces'],
-            'possible_moves': result['possible_moves']
-        }
-    }
+  status, result = controller.get_game_state(db.get_db(), game_id, user_id)
   return { 'status': status, 'result': result }

@@ -53,10 +53,11 @@ def test_register(client: Client, app: Flask):
   response = json.loads(response.get_data(as_text=True))
   assert response['status']
 
-  response = client.get('/get_game_state/' + str(game_id))
+  response = client.get('/get_game_state/' + str(game_id) + '/2')
   assert response.status_code == 200
   response = json.loads(response.get_data(as_text=True))
   assert response['status']
   result = response['result']
-  assert isinstance(result['pieces'], list)
-  assert isinstance(result['possible_moves'], list)
+  assert isinstance(result['game_state'], dict)
+  assert result['color'] == 'black'
+  assert result['turn'] == 'black'

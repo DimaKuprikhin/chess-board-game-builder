@@ -62,7 +62,15 @@ class Controller:
     host.finish()
     if status:
       games_database.update_entry(db, game.set_game_state(json.dumps(result)))
-    return status, { 'game_state': result, 'game_id': game.get_id() }
+      color = 'white' if game.get_first_player_plays_as(
+      ) == 'black' else 'black'
+      return status, {
+          'game_state': result,
+          'game_id': game.get_id(),
+          'color': color,
+          'turn': 'white'
+      }
+    return False, result
 
   def load_script(self, db: sqlite3.Connection,
                   script: str) -> Tuple[bool, Any]:
@@ -107,11 +115,25 @@ class Controller:
       # Update game state in database.
       game.set_move_number(game.get_move_number() + 1)
       games_database.update_entry(db, game.set_game_state(json.dumps(result)))
-    return status, result
+    color = game.get_first_player_plays_as()
+    if user_id != game.get_first_player_id():
+      color = 'white' if color == 'black' else 'black'
+    return status, { 'game_state': result, 'color': color, 'turn': next_turn }
 
-  def get_game_state(self, db: sqlite3.Connection,
-                     game_id: int) -> Tuple[bool, Any]:
+  def get_game_state(self, db: sqlite3.Connection, game_id: int,
+                     user_id: int) -> Tuple[bool, Any]:
     game = games_database.get_entry(db, game_id)
     if game is None:
       return False, 'There is no game with this id'
-    return True, json.loads(game.get_game_state())
+    color = game.get_first_player_plays_as()
+    if user_id != game.get_first_player_id():
+      color = 'white' if color == 'black' else 'black'
+    turn = 'white' if game.get_move_number() % 2 == 0 else 'black'
+    game_state = game.get_game_state()
+    if game_state is None:
+      game_state = '{"pieces": [], "possible_moves": [], "additional_data": {}, "status": "not started"}'
+    return True, {
+        'game_state': json.loads(game_state),
+        'color': color,
+        'turn': turn
+    }

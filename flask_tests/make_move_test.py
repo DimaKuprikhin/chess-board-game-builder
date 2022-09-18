@@ -52,3 +52,6 @@ def test_register(client: Client, app: Flask):
   assert response.status_code == 200
   response = json.loads(response.get_data(as_text=True))
   assert response['status']
+  result = response['result']
+  assert result['color'] == 'white'
+  assert result['turn'] == 'black'

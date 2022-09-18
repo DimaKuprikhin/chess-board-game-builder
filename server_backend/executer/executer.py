@@ -18,8 +18,8 @@ class Executer:
     if not init_by_test:
       FILE_LIMIT = 0
       resource.setrlimit(resource.RLIMIT_FSIZE, [FILE_LIMIT, FILE_LIMIT])
-      FD_LIMIT = 0
-      resource.setrlimit(resource.RLIMIT_NOFILE, [FD_LIMIT, FD_LIMIT])
+      # FD_LIMIT = 0
+      # resource.setrlimit(resource.RLIMIT_NOFILE, [FD_LIMIT, FD_LIMIT])
 
     resource.setrlimit(resource.RLIMIT_NPROC, [0, 0])
     resource.setrlimit(resource.RLIMIT_MEMLOCK, [0, 0])

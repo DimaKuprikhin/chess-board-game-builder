@@ -24,7 +24,4 @@ def make_move():
   move = request_json['move']
 
   status, result = controller.make_move(db.get_db(), game_id, user_id, move)
-
-  if status:
-    return { 'status': status, 'result': { 'game_state': result } }
   return { 'status': status, 'result': result }

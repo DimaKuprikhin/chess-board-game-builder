@@ -25,13 +25,4 @@ def join_by_link():
   link = request_json['link']
 
   status, result = controller.join_by_link(db.get_db(), link, second_player_id)
-
-  if status:
-    return {
-        'status': status,
-        'result': {
-            'game_id': result['game_id'],
-            'game_state': result['game_state']
-        }
-    }
   return { 'status': status, 'result': result }
