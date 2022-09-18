@@ -53,7 +53,7 @@ def test_register(client: Client, app: Flask):
   response = json.loads(response.get_data(as_text=True))
   assert response['status']
 
-  response = client.get('/get_game_state/', json={ 'game_id': game_id })
+  response = client.get('/get_game_state/' + str(game_id))
   assert response.status_code == 200
   response = json.loads(response.get_data(as_text=True))
   assert response['status']

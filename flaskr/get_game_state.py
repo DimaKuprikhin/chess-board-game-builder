@@ -9,19 +9,12 @@ get_game_state_bp = Blueprint(
 )
 
 
-@get_game_state_bp.route('/', methods=['GET'])
-def get_game_state():
-  if request.content_length >= 1024 * 1024:
-    return json.dumps({ 'status': False, 'message': 'Data too large'})
-  request_json = json.loads(
-      request.get_data(cache=False, as_text=True, parse_form_data=False)
-  )
-
+@get_game_state_bp.route('/<int:game_id>', methods=['GET'])
+def get_game_state(game_id: int):
   controller = Controller(
       'scripts', pathlib.PosixPath('.', 'scripts'),
       current_app.config.get('INIT_BY_TEST', False)
   )
-  game_id = request_json['game_id']
 
   status, result = controller.get_game_state(db.get_db(), game_id)
 
