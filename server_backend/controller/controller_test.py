@@ -57,11 +57,69 @@ class TestContoller:
     status, result = controller.create_game(db, game)
     assert status
     link = result.get_link()
-    status, result = controller.join_by_link(db, link, '127.0.0.1')
+    status, result = controller.join_by_link(db, link, 2)
     assert status
     assert result['game_state'] == 3
     assert isinstance(result['game_id'], int)
-    status, result = controller.join_by_link(db, link, '127.0.0.1')
+    status, result = controller.join_by_link(db, link, 2)
     assert not status
-    status, result = controller.join_by_link(db, 'link', '127.0.0.1')
+    status, result = controller.join_by_link(db, 'link', 2)
     assert not status
+
+  def test_make_move_and_get_game_state(self):
+    script = 'def get_starting_state():\n'
+    script += '  return {"pieces":[{"name": "dummy", "color": "white", "x": 0, "y": 0}],\n'
+    script += '          "possible_moves":[{"from_x":0, "from_y": 0, "to_x": 0, "to_y": 1}],\n'
+    script += '          "additional_data":{}, "status":"running"}\n\n'
+    script += 'def make_move(pieces, move, next_turn, additional_data):\n'
+    script += '  return {"pieces":[{"name": "dummy", "color": "white", "x": 0, "y": 1}],\n'
+    script += '          "possible_moves":[], "additional_data":{}, "status":"running"}\n\n'
+
+    controller = Controller(
+        'server_backend.test_data.scripts_dir',
+        pathlib.PosixPath('.', 'server_backend', 'test_data', 'scripts_dir'),
+        True
+    )
+    db = self._get_db()
+    status, script_id = controller.load_script(db, script)
+    assert status
+
+    game = GameDTO(
+        first_player_id=1,
+        first_player_plays_as='white',
+        move_number=0,
+        turn='white',
+        script_id=script_id
+    )
+    status, result = controller.create_game(db, game)
+    assert status
+    link = result.get_link()
+
+    status, result = controller.join_by_link(db, link, 2)
+    assert status
+    game_id = result['game_id']
+    move = { 'from_x': 0, 'from_y': 0, 'to_x': 0, 'to_y': 1 }
+
+    status, result = controller.make_move(db, game_id, 1, move)
+    assert status
+    assert result['pieces'] == [{
+        'name': 'dummy',
+        'color': 'white',
+        'x': 0,
+        'y': 1
+    }]
+    assert result['possible_moves'] == []
+    assert result['additional_data'] == {}
+    assert result['status'] == 'running'
+
+    status, result = controller.get_game_state(db, game_id)
+    assert status
+    assert result['pieces'] == [{
+        'name': 'dummy',
+        'color': 'white',
+        'x': 0,
+        'y': 1
+    }]
+    assert result['possible_moves'] == []
+    assert result['additional_data'] == {}
+    assert result['status'] == 'running'

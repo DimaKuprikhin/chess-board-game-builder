@@ -328,3 +328,16 @@ class TestChessRules:
         move(7, 0, 5, 0),
     ]
     assert cmp_lists(chess_rules.get_possible_moves(pieces, 'white', additional_data), expected_moves)
+
+  def test_make_move(self):
+    pieces = [
+        piece('pawn', 'white', 0, 1)
+    ]
+    move_ = move(0, 1, 0, 2)
+    game_state = chess_rules.make_move(pieces, move_, 'black', {})
+    expected_pieces = [ piece('pawn', 'white', 0, 2) ]
+    assert cmp_lists(game_state['pieces'], expected_pieces)
+    assert cmp_lists(game_state['possible_moves'], [])
+
+    game_state = chess_rules.get_starting_state()
+    game_state = chess_rules.make_move(game_state['pieces'], move_, 'black', game_state['additional_data'])

@@ -5,6 +5,8 @@ from flaskr import create_game
 from flaskr import db
 from flaskr import join_by_link
 from flaskr import load_script
+from flaskr import get_game_state
+from flaskr import make_move
 
 
 # application factory
@@ -42,4 +44,6 @@ def create_app(test_config=None):
   app.register_blueprint(load_script.load_script_bp)
   app.register_blueprint(create_game.create_game_bp)
   app.register_blueprint(join_by_link.join_by_link_bp)
+  app.register_blueprint(make_move.make_move_bp)
+  app.register_blueprint(get_game_state.get_game_state_bp)
   return app

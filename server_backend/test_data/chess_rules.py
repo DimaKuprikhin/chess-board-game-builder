@@ -316,7 +316,9 @@ def get_starting_state():
   }
 
 def make_move(pieces, move, next_turn, additional_data):
-  pieces_, additional_data_ = do_make_move(pieces, move, additional_data)
+  result = do_make_move(pieces, move, additional_data)
+  pieces_ = result['pieces']
+  additional_data_ = result['additional_data']
   possible_moves = get_possible_moves(pieces_, next_turn, additional_data_)
   status = 'running'
   if len(possible_moves) == 0:

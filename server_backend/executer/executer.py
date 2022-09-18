@@ -15,10 +15,11 @@ class Executer:
     resource.setrlimit(resource.RLIMIT_AS, [MEM_LIMIT, MEM_LIMIT])
 
     # Pytest needs file manipulations.
-    FILE_LIMIT = 4 * KB if init_by_test else 0
-    resource.setrlimit(resource.RLIMIT_FSIZE, [FILE_LIMIT, FILE_LIMIT])
-    # FD_LIMIT = 12 if init_by_test else 0
-    # resource.setrlimit(resource.RLIMIT_NOFILE, [FD_LIMIT, FD_LIMIT])
+    if not init_by_test:
+      FILE_LIMIT = 0
+      resource.setrlimit(resource.RLIMIT_FSIZE, [FILE_LIMIT, FILE_LIMIT])
+      FD_LIMIT = 0
+      resource.setrlimit(resource.RLIMIT_NOFILE, [FD_LIMIT, FD_LIMIT])
 
     resource.setrlimit(resource.RLIMIT_NPROC, [0, 0])
     resource.setrlimit(resource.RLIMIT_MEMLOCK, [0, 0])
