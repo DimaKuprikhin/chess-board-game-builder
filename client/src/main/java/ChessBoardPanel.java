@@ -24,6 +24,7 @@ public class ChessBoardPanel extends JPanel {
     }
 
     @Override public void paint(Graphics g) {
+        // TODO: repaint only changed area.
         Dimension dimension = this.getSize();
         int width = dimension.width / 8;
         int height = dimension.height / 8;
@@ -41,18 +42,25 @@ public class ChessBoardPanel extends JPanel {
             if (p.equals(selectedPiece)) {
                 continue;
             }
+            int x = p.getX() * width;
+            int y = p.getY() * height;
+            // Reverse board so our pieces always at the bottom.
+            if (playerColor.equals(Color.WHITE)) {
+                y = dimension.height - y - height;
+            }
             // TODO: cache scaled images.
             g.drawImage(images.get(p.imageName).getScaledInstance(width, height,
                                                                   Image.SCALE_SMOOTH),
-                        p.getX() * width, p.getY() * height, this);
+                        x, y, this);
         }
         // Paint selected piece last to make it appear on top of other pieces.
         if (selectedPiece != null) {
+            int x = selectedPiecePosition.x - width / 2;
+            int y = selectedPiecePosition.y - height / 2;
             g.drawImage(images.get(selectedPiece.imageName)
                               .getScaledInstance(width, height,
                                                  Image.SCALE_SMOOTH),
-                        selectedPiecePosition.x - width / 2,
-                        selectedPiecePosition.y - height / 2, this);
+                        x, y, this);
         }
     }
 
@@ -83,7 +91,10 @@ public class ChessBoardPanel extends JPanel {
     }
 
     private Point getCellByPosition(int x, int y) {
-        return new Point(x / (getSize().width / 8), y / (getSize().height / 8));
+        if (playerColor.equals(Color.BLACK)) {
+            return new Point(x / (getSize().width / 8), y / (getSize().height / 8));
+        }
+        return new Point(x / (getSize().width / 8), (getSize().height - y) / (getSize().height / 8));
     }
 
     private void addMouseListeners() {
