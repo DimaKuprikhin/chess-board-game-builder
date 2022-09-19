@@ -4,10 +4,15 @@ import java.awt.*;
 import java.io.File;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Controller {
     private ChessBoardPanel boardPanel;
     private HttpManager httpManager;
+    private Long gameId = null;
+    private Timer timer = new Timer();
+    private LinkWindow linkWindow = null;
 
     public void addBoard(ChessBoardPanel boardPanel) {
         this.boardPanel = boardPanel;
@@ -21,10 +26,27 @@ public class Controller {
         }
         if (response.containsKey("status") && !((boolean) response.get(
                 "status"))) {
-            Utils.showError("Ошибка", (String) response.get("result"));
+            Utils.showError("Ошибка", "Ошибкана сервере");
             return false;
         }
         return true;
+    }
+
+    private void scheduleUpdateGameState() {
+        if (timer == null) {
+            timer = new Timer();
+        }
+        long TIMER_TASK_DELAY = 2000;
+        timer.schedule(new TimerTask() {
+            @Override public void run() {
+                updateGameState();
+            }
+        }, TIMER_TASK_DELAY);
+    }
+
+    private void cancelTimer() {
+        timer.cancel();
+        timer = null;
     }
 
     public void createGame(String script, String playAs) {
@@ -38,7 +60,9 @@ public class Controller {
         response = httpManager.createGame((long) result.get("script_id"), playAs);
         if (checkResponseStatus(response)) {
             result = (JSONObject) response.get("result");
-            new LinkWindow((String) result.get("link"));
+            gameId = (Long) result.get("id");
+            linkWindow = new LinkWindow((String) result.get("link"));
+            scheduleUpdateGameState();
         }
     }
 
@@ -52,9 +76,15 @@ public class Controller {
         if (!checkResponseStatus(response)) {
             return;
         }
-        GameState gameState = GameState.fromJSON((JSONObject) response.get("result"));
-//        Color color = ((String) response.get("color")).equals("white") ? Color.WHITE : Color.BLACK;
-        boardPanel.updateBoard(gameState, Color.WHITE, Color.WHITE);
+        JSONObject result = (JSONObject) response.get("result");
+        GameState gameState = GameState.fromJSON((JSONObject) result.get("game_state"));
+        Color color = Utils.fromString((String) result.get("color"));
+        Color turn = Utils.fromString((String) result.get("turn"));
+        this.gameId = (Long) result.get("game_id");
+        boardPanel.updateBoard(gameState, color, turn);
+        if (color != turn) {
+            scheduleUpdateGameState();
+        }
     }
 
     public void onJoinGameButton() {
@@ -63,13 +93,43 @@ public class Controller {
         new JoinGameWindow(this);
     }
 
-    public void onMoveByMouse(Point from, Point to) {
-        // chess board panel has a set of possible moves, so we are guaranteed
-        // to have a valid move here and only need to send it to server.
+    private void updateGameState() {
+        JSONObject response = httpManager.getGameState(gameId);
+        if (!checkResponseStatus(response)) {
+            return;
+        }
+        JSONObject result = (JSONObject) response.get("result");
+        GameState gameState = GameState.fromJSON((JSONObject) result.get("game_state"));
+        Color color = Utils.fromString((String) result.get("color"));
+        Color turn = Utils.fromString((String) result.get("turn"));
+        boardPanel.updateBoard(gameState, color, turn);
+        if (!gameState.status.equals("not started")) {
+            if (linkWindow != null) {
+                linkWindow.dispose();
+                linkWindow = null;
+            }
+        }
+        // It's our turn, so game_state will not change on the server.
+        if (gameState.status.equals("not started") || color != turn) {
+            scheduleUpdateGameState();
+        }
+        else {
+            cancelTimer();
+        }
     }
 
-    public void onMoveFromServer(List<Piece> pieces, List<Move> possibleMoves) {
-        // receive game state (piece positions and possible moves) from a
-        // server and update chess board panel with this data.
+    public void onMakeMove(Point from, Point to) {
+        // chess board panel has a set of possible moves, so we are guaranteed
+        // to have a valid move here and only need to send it to server.
+        JSONObject response = httpManager.makeMove(new Move(from, to), gameId);
+        if (!checkResponseStatus(response)) {
+            return;
+        }
+        JSONObject result = (JSONObject) response.get("result");
+        GameState gameState = GameState.fromJSON((JSONObject) result.get("game_state"));
+        Color color = Utils.fromString((String) result.get("color"));
+        Color turn = Utils.fromString((String) result.get("turn"));
+        boardPanel.updateBoard(gameState, color, turn);
+        scheduleUpdateGameState();
     }
 }

@@ -19,9 +19,19 @@ public class Move {
         return new Move(new Point(fromX, fromY), new Point(toX, toY));
     }
 
+    public JSONObject toJSON() {
+        JSONObject move = new JSONObject();
+        move.put("from_x", from.x);
+        move.put("from_y", from.y);
+        move.put("to_x", to.x);
+        move.put("to_y", to.y);
+        System.out.println("Move " + move.toJSONString());
+        return move;
+    }
+
     @Override
     public String toString() {
-        return "fromX: " + from.x + ", fromY: " + from.y + ", toX: " + to.x + ", toY: " + to.y;
+        return "{ \"from_x\": " + from.x + ", \"from_y\": " + from.y + ", \"to_x\": " + to.x + ", \"to_y\": " + to.y + " }";
     }
 
     @Override

@@ -7,12 +7,14 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Random;
 
 public class HttpManager {
     private final String scheme;
     private final String host;
     private final int port;
     private final HttpClient client;
+    private final long userId;
 
     HttpManager(String scheme, String host, int port) {
         this.scheme = scheme;
@@ -20,6 +22,7 @@ public class HttpManager {
         this.port = port;
         this.client = HttpClient.newBuilder()
                                 .version(HttpClient.Version.HTTP_1_1).build();
+        this.userId = (new Random(System.currentTimeMillis())).nextLong() / 2 + (1L << 62) + 1L;
     }
 
     private URI getURI(String path) {
@@ -36,6 +39,7 @@ public class HttpManager {
     private JSONObject toJSON(String json) {
         // Strings for parsing are received from server, so we are not expecting
         // this to fail and do not check return value for null.
+        System.out.println("Response " + json);
         JSONParser parser = new JSONParser();
         try {
             return (JSONObject) parser.parse(json);
@@ -59,6 +63,7 @@ public class HttpManager {
         JSONObject requestJson = new JSONObject();
         requestJson.put("script_id", scriptId);
         requestJson.put("play_as", playAs);
+        requestJson.put("user_id", userId);
         HttpRequest request = HttpRequest
                 .newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(
@@ -74,6 +79,7 @@ public class HttpManager {
         URI uri = getURI("/join_by_link/");
         JSONObject requestJson = new JSONObject();
         requestJson.put("link", link);
+        requestJson.put("user_id", userId);
         HttpRequest.BodyPublisher publisher = HttpRequest.BodyPublishers.ofString(
                 requestJson.toJSONString());
         HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(publisher).build();
@@ -88,6 +94,34 @@ public class HttpManager {
         URI uri = getURI("/load_script/");
         JSONObject requestJson = new JSONObject();
         requestJson.put("script", script);
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.ofString(
+                requestJson.toJSONString())).build();
+        String response = sendRequest(request);
+        if (response == null) {
+            return null;
+        }
+        return toJSON(response);
+    }
+
+    public JSONObject getGameState(long gameId) {
+        URI uri = getURI("/get_game_state/" + gameId + "/" + userId);
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("game_id", gameId);
+        requestJson.put("user_id", userId);
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+        String response = sendRequest(request);
+        if (response == null) {
+            return null;
+        }
+        return toJSON(response);
+    }
+
+    public JSONObject makeMove(Move move, long gameId) {
+        URI uri = getURI("/make_move/");
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("game_id", gameId);
+        requestJson.put("move", move.toJSON());
+        requestJson.put("user_id", userId);
         HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.ofString(
                 requestJson.toJSONString())).build();
         String response = sendRequest(request);

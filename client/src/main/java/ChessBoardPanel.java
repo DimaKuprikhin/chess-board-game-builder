@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class ChessBoardPanel extends JPanel {
+    private final Controller controller;
     private final Map<String, Image> images;
     private ArrayList<Piece> pieces;
     private ArrayList<Move> possibleMoves = new ArrayList<>();
@@ -15,7 +16,8 @@ public class ChessBoardPanel extends JPanel {
     private Piece selectedPiece = null;
     private Point selectedPiecePosition = null;
 
-    public ChessBoardPanel(ArrayList<Piece> pieces, Map<String, Image> images) {
+    public ChessBoardPanel(Controller controller, ArrayList<Piece> pieces, Map<String, Image> images) {
+        this.controller = controller;
         this.pieces = pieces;
         this.images = images;
         this.addMouseListeners();
@@ -36,9 +38,10 @@ public class ChessBoardPanel extends JPanel {
             }
         }
         for (Piece p : pieces) {
-            if (p == selectedPiece) {
+            if (p.equals(selectedPiece)) {
                 continue;
             }
+            // TODO: cache scaled images.
             g.drawImage(images.get(p.imageName).getScaledInstance(width, height,
                                                                   Image.SCALE_SMOOTH),
                         p.getX() * width, p.getY() * height, this);
@@ -128,6 +131,7 @@ public class ChessBoardPanel extends JPanel {
                     thisPanel.repaint();
                     return;
                 }
+                Point from = null;
                 Point releaseCell = getCellByPosition(e.getX(), e.getY());
                 Move move = new Move(new Point(selectedPiece.getX(), selectedPiece.getY()),
                                      releaseCell);
@@ -141,11 +145,15 @@ public class ChessBoardPanel extends JPanel {
                             pieces.remove(pieceIndex);
                         }
                     }
+                    from = new Point(selectedPiece.getX(), selectedPiece.getY());
                     selectedPiece.move(releaseCell.x, releaseCell.y);
                 }
                 selectedPiece = null;
                 selectedPiecePosition = null;
                 thisPanel.repaint();
+                if (from != null) {
+                    controller.onMakeMove(from, releaseCell);
+                }
             }
 
             @Override public void mouseEntered(MouseEvent e) {

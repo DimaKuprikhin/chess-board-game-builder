@@ -41,10 +41,10 @@ public class MainWindow {
         });
 
         ArrayList<Piece> pieces = new ArrayList<>();
-        pieces.add(new Piece("rook", Color.BLACK, 0, 0));
-        pieces.add(new Piece("king", Color.WHITE, 7, 7));
+//        pieces.add(new Piece("rook", Color.BLACK, 0, 0));
+//        pieces.add(new Piece("king", Color.WHITE, 7, 7));
 
-        ChessBoardPanel chessBoard = new ChessBoardPanel(pieces,
+        ChessBoardPanel chessBoard = new ChessBoardPanel(controller, pieces,
                                                          Utils.getPieceImages());
         chessBoard.setBorder(new EmptyBorder(8, 8, 8, 8));
         Color background = new Color(255, 255, 255);

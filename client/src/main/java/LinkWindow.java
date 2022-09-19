@@ -3,10 +3,12 @@ import java.awt.*;
 
 public class LinkWindow {
     private final String link;
+    private final JFrame frame;
 
     LinkWindow(String link) {
         this.link = link;
-        setupGUI(new JFrame("Код для присоединения"));
+        this.frame = new JFrame("Код для присоединения");
+        setupGUI(this.frame);
     }
 
     private void setupGUI(JFrame frame) {
@@ -24,5 +26,9 @@ public class LinkWindow {
         link.setLocation((frame.getWidth() - link.getWidth()) / 2, 30);
 
         frame.setVisible(true);
+    }
+
+    public void dispose() {
+        this.frame.dispose();
     }
 }

@@ -6,14 +6,15 @@ import java.util.ArrayList;
 public class GameState {
     public final ArrayList<Piece> pieces;
     public final ArrayList<Move> possibleMoves;
+    public final String status;
 
-    public GameState(ArrayList<Piece> pieces, ArrayList<Move> possibleMoves) {
+    public GameState(ArrayList<Piece> pieces, ArrayList<Move> possibleMoves, String status) {
         this.pieces = pieces;
         this.possibleMoves = possibleMoves;
+        this.status = status;
     }
 
     public static GameState fromJSON(JSONObject json) {
-        System.out.println(json.toJSONString());
         Object[] piecesJson = ((JSONArray) json.get("pieces")).toArray();
         Object[] possibleMovesJson = ((JSONArray) json.get("possible_moves")).toArray();
         ArrayList<Piece> pieces = new ArrayList<>();
@@ -24,6 +25,7 @@ public class GameState {
         for (Object move : possibleMovesJson) {
             possibleMoves.add(Move.fromJSON((JSONObject) move));
         }
-        return new GameState(pieces, possibleMoves);
+        String status = (String) json.get("status");
+        return new GameState(pieces, possibleMoves, status);
     }
 }
