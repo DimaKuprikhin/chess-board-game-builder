@@ -53,6 +53,23 @@ public class ChessBoardPanel extends JPanel {
                                                                   Image.SCALE_SMOOTH),
                         x, y, this);
         }
+        if (selectedPiece != null) {
+            for (Object moveObj : possibleMoves.stream()
+                                               .filter(m -> m.from.x == selectedPiece.getX()
+                                                       && m.from.y == selectedPiece.getY())
+                                               .toArray()) {
+                Move move = (Move) moveObj;
+                g.setColor(new Color(0, 0, 255, 64));
+                int radius = width / 8;
+                int y = move.to.y * height + height / 2;
+                if (playerColor == Color.WHITE) {
+                    y = dimension.height - y;
+                }
+                y -= radius;
+                g.fillOval(move.to.x * width + width / 2 - radius,
+                           y, 2 * radius, 2 * radius);
+            }
+        }
         // Paint selected piece last to make it appear on top of other pieces.
         if (selectedPiece != null) {
             int x = selectedPiecePosition.x - width / 2;
