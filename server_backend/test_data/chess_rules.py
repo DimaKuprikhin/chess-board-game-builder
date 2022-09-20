@@ -107,6 +107,8 @@ def do_get_possible_moves(pieces, turn, additional_data):
         to_y = y + dy
         if in_bounds(to_x, to_y) and (is_opposite(to_x, to_y, 'white') or is_free(to_x, to_y)):
           add_move(x, y, to_x, to_y)
+    if additional_data['white_king_is_attacked']:
+      return
     rook = piece_at(0, 0)
     if (x == 4 and y == 0 and rook is not None and rook['name'] == 'rook' and rook['color'] == turn
         and not additional_data['white_king_moved'] and not additional_data['white_a_rook_moved']
@@ -127,6 +129,8 @@ def do_get_possible_moves(pieces, turn, additional_data):
         to_y = y + dy
         if in_bounds(to_x, to_y) and (is_opposite(to_x, to_y, 'black') or is_free(to_x, to_y)):
           add_move(x, y, to_x, to_y)
+    if additional_data['black_king_is_attacked']:
+      return
     rook = piece_at(0, 7)
     if (x == 4 and y == 7 and rook is not None and rook['name'] == 'rook' and rook['color'] == turn
         and not additional_data['black_king_moved'] and not additional_data['black_a_rook_moved']
@@ -197,7 +201,20 @@ def filter_possible_moves(pieces, turn, additional_data, moves):
 
 def get_possible_moves(pieces, turn, additional_data):
   moves = do_get_possible_moves(pieces, turn, additional_data)
-  return filter_possible_moves(pieces, turn, additional_data, moves)
+  moves = filter_possible_moves(pieces, turn, additional_data, moves)
+  # white_king = [p for p in pieces if p['color'] == 'white' and p['name'] == 'king']
+  # black_king = [p for p in pieces if p['color'] == 'black' and p['name'] == 'king']
+  # if white_king is not None and len(white_king) > 0:
+  #   white_king = white_king[0]
+  #   additional_data['white_king_is_attacked'] = False
+  #   if [m for m in moves if m['to_x'] == white_king['x'] and m['to_y'] == white_king['y']] is not None:
+  #     additional_data['white_king_is_attacked'] = True
+  # if black_king is not None and len(black_king) > 0:
+  #   black_king = black_king[0]
+  #   additional_data['black_king_is_attacked'] = False
+  #   if [m for m in moves if m['to_x'] == black_king['x'] and m['to_y'] == black_king['y']] is not None:
+  #     additional_data['black_king_is_attacked'] = True
+  return moves
 
 def do_make_move(pieces, move, additional_data):
   def piece_at(x, y):
@@ -306,7 +323,9 @@ def get_starting_state():
         'white_a_rook_moved': False,
         'white_h_rook_moved': False,
         'black_a_rook_moved': False,
-        'black_h_rook_moved': False
+        'black_h_rook_moved': False,
+        'white_king_is_attacked': False,
+        'black_king_is_attacked': False
     }
   return {
     'pieces': pieces,
@@ -319,7 +338,21 @@ def make_move(pieces, move, next_turn, additional_data):
   result = do_make_move(pieces, move, additional_data)
   pieces_ = result['pieces']
   additional_data_ = result['additional_data']
+
+  additional_data_['white_king_is_attacked'] = False
+  additional_data_['black_king_is_attacked'] = False
+  king = [p for p in pieces_ if p['color'] == next_turn and p['name'] == 'king']
+  if king is not None and len(king) > 0:
+    king = king[0]
+    next_possible_moves = get_possible_moves(
+        pieces_, 'white' if next_turn == 'black' else 'black', additional_data_
+    )
+    king_attacking_moves = [m for m in next_possible_moves if m['to_x'] == king['x'] and m['to_y'] == king['y']]
+    if king_attacking_moves is not None and len(king_attacking_moves) > 0:
+      additional_data_[next_turn + '_king_is_attacked'] = True
+
   possible_moves = get_possible_moves(pieces_, next_turn, additional_data_)
+
   status = 'running'
   if len(possible_moves) == 0:
     status = ('white' if next_turn == 'black' else 'black') + ' won'

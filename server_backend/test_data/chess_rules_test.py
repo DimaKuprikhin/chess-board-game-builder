@@ -198,7 +198,8 @@ class TestChessRules:
         move(3, 3, 4, 3),
         move(3, 3, 4, 4),
     ]
-    assert cmp_lists(chess_rules.get_possible_moves(pieces, 'white', {}), expected_moves)
+    additional_data = {'white_king_is_attacked': False, 'black_king_is_attacked': False}
+    assert cmp_lists(chess_rules.get_possible_moves(pieces, 'white', additional_data), expected_moves)
 
     # can't step on pieces with the same color but can do it with other color
     pieces.extend([
@@ -214,7 +215,7 @@ class TestChessRules:
         move(3, 3, 4, 2),
         move(3, 3, 4, 3)
     ]
-    assert cmp_lists(chess_rules.get_possible_moves(pieces, 'white', {}), expected_moves)
+    assert cmp_lists(chess_rules.get_possible_moves(pieces, 'white', additional_data), expected_moves)
 
     # castling
     pieces = [
@@ -230,7 +231,9 @@ class TestChessRules:
     additional_data = {
         'black_king_moved': False,
         'black_a_rook_moved': False,
-        'black_h_rook_moved': False
+        'black_h_rook_moved': False,
+        'white_king_is_attacked': False,
+        'black_king_is_attacked': False
     }
     expected_moves = [
         move(4, 7, 3, 7),
@@ -260,7 +263,9 @@ class TestChessRules:
     additional_data = {
         'black_king_moved': False,
         'black_a_rook_moved': False,
-        'black_h_rook_moved': False
+        'black_h_rook_moved': False,
+        'white_king_is_attacked': False,
+        'black_king_is_attacked': False
     }
     expected_moves = [
         move(4, 7, 3, 7),
@@ -288,7 +293,9 @@ class TestChessRules:
     additional_data = {
         'black_king_moved': False,
         'black_a_rook_moved': False,
-        'black_h_rook_moved': False
+        'black_h_rook_moved': False,
+        'white_king_is_attacked': False,
+        'black_king_is_attacked': False
     }
     expected_moves = [
         move(4, 7, 5, 7),
@@ -315,7 +322,9 @@ class TestChessRules:
     additional_data = {
         'white_king_moved': False,
         'white_a_rook_moved': False,
-        'white_h_rook_moved': True
+        'white_h_rook_moved': True,
+        'white_king_is_attacked': False,
+        'black_king_is_attacked': False
     }
     expected_moves = [
         move(4, 0, 3, 0),
@@ -328,6 +337,31 @@ class TestChessRules:
         move(7, 0, 5, 0),
     ]
     assert cmp_lists(chess_rules.get_possible_moves(pieces, 'white', additional_data), expected_moves)
+
+    # can't castle because the white king is under attack
+    pieces = [
+        piece('king', 'white', 4, 0),
+        piece('rook', 'white', 0, 0),
+        piece('rook', 'black', 3, 7),
+        piece('dummy', 'white', 0, 1),
+        piece('dummy', 'white', 3, 1),
+        piece('dummy', 'white', 5, 1)
+    ]
+    additional_data = {
+        'white_king_moved': False,
+        'white_a_rook_moved': False,
+        'white_h_rook_moved': True,
+        'white_king_is_attacked': False,
+        'black_king_is_attacked': False
+    }
+    expected_moves = [
+        move(4, 0, 3, 0),
+        move(4, 0, 5, 0)
+    ]
+    assert cmp_lists(
+        chess_rules.make_move(pieces, move(3, 7, 4, 7), 'white', additional_data)['possible_moves'],
+        expected_moves
+    )
 
   def test_make_move(self):
     pieces = [
