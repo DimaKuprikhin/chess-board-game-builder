@@ -59,7 +59,7 @@ public class MainWindow {
         mainFrame.add(mainPanel);
         // Ensures JVM closes after frame(s) closed and
         // all non-daemon threads are finished
-        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // See https://stackoverflow.com/a/7143398/418556 for demo.
         mainFrame.setLocationByPlatform(true);
         // ensures the frame is the minimum size it needs to be
