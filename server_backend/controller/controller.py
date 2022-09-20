@@ -92,6 +92,19 @@ class Controller:
     game = games_database.get_entry(db, game_id)
     if game is None:
       return False, 'There is no game with this id'
+
+    if self._check_for_draw(game):
+      game_state = json.loads(game.get_game_state())
+      game_state['possible_moves'] = []
+      game_state['status'] = 'draw'
+      game.set_game_state(game_state)
+      games_database.update_entry(db, game)
+      return True, {
+          'game_state': game_state,
+          'color': color,
+          'turn': 'white'
+      }
+
     script_id = game.get_script_id()
     module_name = scripts_database.get_module_name(db, script_id)
     if module_name is None:
@@ -137,3 +150,6 @@ class Controller:
         'color': color,
         'turn': turn
     }
+
+  def _check_for_draw(self, game: game_dto.GameDTO) -> bool:
+    return game.get_move_number() >= 200
