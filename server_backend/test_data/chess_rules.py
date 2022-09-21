@@ -202,18 +202,6 @@ def filter_possible_moves(pieces, turn, additional_data, moves):
 def get_possible_moves(pieces, turn, additional_data):
   moves = do_get_possible_moves(pieces, turn, additional_data)
   moves = filter_possible_moves(pieces, turn, additional_data, moves)
-  # white_king = [p for p in pieces if p['color'] == 'white' and p['name'] == 'king']
-  # black_king = [p for p in pieces if p['color'] == 'black' and p['name'] == 'king']
-  # if white_king is not None and len(white_king) > 0:
-  #   white_king = white_king[0]
-  #   additional_data['white_king_is_attacked'] = False
-  #   if [m for m in moves if m['to_x'] == white_king['x'] and m['to_y'] == white_king['y']] is not None:
-  #     additional_data['white_king_is_attacked'] = True
-  # if black_king is not None and len(black_king) > 0:
-  #   black_king = black_king[0]
-  #   additional_data['black_king_is_attacked'] = False
-  #   if [m for m in moves if m['to_x'] == black_king['x'] and m['to_y'] == black_king['y']] is not None:
-  #     additional_data['black_king_is_attacked'] = True
   return moves
 
 def do_make_move(pieces, move, additional_data):
