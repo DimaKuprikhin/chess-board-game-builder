@@ -92,13 +92,31 @@ class Controller:
     game = games_database.get_entry(db, game_id)
     if game is None:
       return False, 'There is no game with this id'
+    
+    if move == 'resign':
+      winning_user_color = game.get_first_player_plays_as()
+      if game.get_first_player_id() == user_id:
+        winning_user_color = 'white' if winning_user_color == 'black' else 'black'
+      resigned_user_color = 'white' if winning_user_color == 'black' else 'black'
+      game_state = json.loads(game.get_game_state())
+      game_state['possible_moves'] = []
+      game_state['status'] = winning_user_color + ' won'
+      games_database.update_entry(db, game.set_game_state(json.dumps(game_state)))
+      return True, {
+        'game_state': game_state,
+        'color': resigned_user_color,
+        'turn': 'white'
+      }
 
+    # TODO: needs testing.
     if self._check_for_draw(game):
       game_state = json.loads(game.get_game_state())
       game_state['possible_moves'] = []
       game_state['status'] = 'draw'
-      game.set_game_state(game_state)
-      games_database.update_entry(db, game)
+      games_database.update_entry(db, game.set_game_state(json.dumps(game_state)))
+      color = game.get_first_player_plays_as()
+      if user_id != game.get_first_player_id():
+        color = 'white' if color == 'black' else 'black'
       return True, {
           'game_state': game_state,
           'color': color,

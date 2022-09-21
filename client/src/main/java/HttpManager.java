@@ -130,4 +130,19 @@ public class HttpManager {
         }
         return toJSON(response);
     }
+
+    public JSONObject resign(long gameId) {
+        URI uri = getURI("/make_move/");
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("game_id", gameId);
+        requestJson.put("move", "resign");
+        requestJson.put("user_id", userId);
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.ofString(
+                requestJson.toJSONString())).build();
+        String response = sendRequest(request);
+        if (response == null) {
+            return null;
+        }
+        return toJSON(response);
+    }
 }
