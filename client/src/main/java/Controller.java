@@ -7,15 +7,23 @@ import java.util.TimerTask;
 
 public class Controller {
     private ChessBoardPanel boardPanel;
-    private HttpManager httpManager;
+    private final HttpManager httpManager;
     private Long gameId = null;
     private Timer timer = new Timer();
     private LinkWindow linkWindow = null;
     private MainWindow mainWindow = null;
 
+    public Controller(boolean useLocalServer) {
+        if (useLocalServer) {
+            this.httpManager = new HttpManager("http", "localhost", 5000);
+        }
+        else {
+            this.httpManager = new HttpManager("http", "51.250.76.192", 8080);
+        }
+    }
+
     public void addBoard(ChessBoardPanel boardPanel) {
         this.boardPanel = boardPanel;
-        this.httpManager = new HttpManager("http", "localhost", 5000);
     }
 
     public void addMainWindow(MainWindow mainWindow) {

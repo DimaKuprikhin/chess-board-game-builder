@@ -6,18 +6,21 @@ import java.util.ArrayList;
 
 public class MainWindow {
     private final JPanel mainPanel = new JPanel(new BorderLayout(3, 3));
-    private final Controller controller = new Controller();
+    private final Controller controller;
     private AbstractAction createGame = null;
     private AbstractAction joinGame = null;
     private AbstractAction resign = null;
 
-    MainWindow() {
+    MainWindow(Controller controller) {
+        this.controller = controller;
         setupGUI(new JFrame("ChessBoardGameBuilder"));
     }
 
     public static void main(String[] args) {
         Runnable r = () -> {
-            MainWindow cg = new MainWindow();
+            boolean useLocalServer = args.length > 0 && args[0].equals(
+                    "use-local-server");
+            MainWindow cg = new MainWindow(new Controller(useLocalServer));
         };
         // Swing GUIs should be created and updated on the EDT
         // http://docs.oracle.com/javase/tutorial/uiswing/concurrency
