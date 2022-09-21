@@ -39,7 +39,6 @@ public class HttpManager {
     private JSONObject toJSON(String json) {
         // Strings for parsing are received from server, so we are not expecting
         // this to fail and do not check return value for null.
-        System.out.println("Response " + json);
         JSONParser parser = new JSONParser();
         try {
             return (JSONObject) parser.parse(json);

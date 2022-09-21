@@ -25,7 +25,6 @@ public class Move {
         move.put("from_y", from.y);
         move.put("to_x", to.x);
         move.put("to_y", to.y);
-        System.out.println("Move " + move.toJSONString());
         return move;
     }
 
