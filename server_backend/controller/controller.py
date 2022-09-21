@@ -92,7 +92,7 @@ class Controller:
     game = games_database.get_entry(db, game_id)
     if game is None:
       return False, 'There is no game with this id'
-    
+
     if move == 'resign':
       winning_user_color = game.get_first_player_plays_as()
       if game.get_first_player_id() == user_id:
@@ -101,11 +101,13 @@ class Controller:
       game_state = json.loads(game.get_game_state())
       game_state['possible_moves'] = []
       game_state['status'] = winning_user_color + ' won'
-      games_database.update_entry(db, game.set_game_state(json.dumps(game_state)))
+      games_database.update_entry(
+          db, game.set_game_state(json.dumps(game_state))
+      )
       return True, {
-        'game_state': game_state,
-        'color': resigned_user_color,
-        'turn': 'white'
+          'game_state': game_state,
+          'color': resigned_user_color,
+          'turn': 'white'
       }
 
     # TODO: needs testing.
@@ -113,15 +115,13 @@ class Controller:
       game_state = json.loads(game.get_game_state())
       game_state['possible_moves'] = []
       game_state['status'] = 'draw'
-      games_database.update_entry(db, game.set_game_state(json.dumps(game_state)))
+      games_database.update_entry(
+          db, game.set_game_state(json.dumps(game_state))
+      )
       color = game.get_first_player_plays_as()
       if user_id != game.get_first_player_id():
         color = 'white' if color == 'black' else 'black'
-      return True, {
-          'game_state': game_state,
-          'color': color,
-          'turn': 'white'
-      }
+      return True, { 'game_state': game_state, 'color': color, 'turn': 'white'}
 
     script_id = game.get_script_id()
     module_name = scripts_database.get_module_name(db, script_id)
