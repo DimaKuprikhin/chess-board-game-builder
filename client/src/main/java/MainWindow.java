@@ -7,6 +7,9 @@ import java.util.ArrayList;
 public class MainWindow {
     private final JPanel mainPanel = new JPanel(new BorderLayout(3, 3));
     private final Controller controller = new Controller();
+    private AbstractAction createGame = null;
+    private AbstractAction joinGame = null;
+    private AbstractAction resign = null;
 
     MainWindow() {
         setupGUI(new JFrame("ChessBoardGameBuilder"));
@@ -21,7 +24,20 @@ public class MainWindow {
         SwingUtilities.invokeLater(r);
     }
 
-    public final void setupGUI(JFrame mainFrame) {
+    public void disableButtons(String status) {
+        if (status.equals("running")) {
+            createGame.setEnabled(false);
+            joinGame.setEnabled(false);
+            resign.setEnabled(true);
+        }
+        else {
+            createGame.setEnabled(true);
+            joinGame.setEnabled(true);
+            resign.setEnabled(false);
+        }
+    }
+
+    public void setupGUI(JFrame mainFrame) {
         mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         // TODO: replace with a separate layout of buttons.
         JToolBar tools = new JToolBar();
@@ -29,20 +45,28 @@ public class MainWindow {
         tools.setFloatable(false);
         tools.setLayout(new GridLayout(16, 1, 0, 0));
         mainPanel.add(tools, BorderLayout.LINE_START);
-        tools.add(new AbstractAction("Создать игру") {
+        this.createGame = new AbstractAction("Создать игру") {
             @Override public void actionPerformed(ActionEvent e) {
                 controller.onCreateGameButton();
             }
-        });
-        tools.add(new AbstractAction("Присоединиться к игре") {
+        };
+        this.joinGame = new AbstractAction("Присоединиться к игре") {
             @Override public void actionPerformed(ActionEvent e) {
                 controller.onJoinGameButton();
             }
-        });
+        };
+        this.resign = new AbstractAction("Сдаться") {
+            @Override public void actionPerformed(ActionEvent e) {
+                controller.onResign();
+            }
+        };
+        tools.add(this.createGame);
+        tools.add(this.joinGame);
+        tools.add(this.resign);
+        this.resign.setEnabled(false);
+        controller.addMainWindow(this);
 
         ArrayList<Piece> pieces = new ArrayList<>();
-//        pieces.add(new Piece("rook", Color.BLACK, 0, 0));
-//        pieces.add(new Piece("king", Color.WHITE, 7, 7));
 
         ChessBoardPanel chessBoard = new ChessBoardPanel(controller, pieces,
                                                          Utils.getPieceImages());

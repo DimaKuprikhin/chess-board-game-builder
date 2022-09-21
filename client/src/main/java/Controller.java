@@ -6,16 +6,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
-
     private ChessBoardPanel boardPanel;
     private HttpManager httpManager;
     private Long gameId = null;
     private Timer timer = new Timer();
     private LinkWindow linkWindow = null;
+    private MainWindow mainWindow = null;
 
     public void addBoard(ChessBoardPanel boardPanel) {
         this.boardPanel = boardPanel;
         this.httpManager = new HttpManager("http", "localhost", 5000);
+    }
+
+    public void addMainWindow(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
     }
 
     private boolean checkResponseStatus(JSONObject response) {
@@ -99,6 +103,7 @@ public class Controller {
         Color turn = Utils.fromString((String) result.get("turn"));
         this.gameId = (Long) result.get("game_id");
         boardPanel.updateBoard(gameState, color, turn);
+        mainWindow.disableButtons("running");
         if (color != turn) {
             scheduleUpdateGameState();
         }
@@ -128,6 +133,7 @@ public class Controller {
         boardPanel.updateBoard(gameState, color, turn);
         if (!gameState.status.equals("not started")) {
             if (linkWindow != null) {
+                mainWindow.disableButtons("running");
                 linkWindow.dispose();
                 linkWindow = null;
             }
@@ -159,5 +165,9 @@ public class Controller {
         }
         boardPanel.updateBoard(gameState, color, turn);
         scheduleUpdateGameState();
+    }
+
+    public void onResign() {
+        mainWindow.disableButtons("not started");
     }
 }
