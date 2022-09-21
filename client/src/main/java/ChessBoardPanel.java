@@ -4,9 +4,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ChessBoardPanel extends JPanel {
+    // Cache for scaled images of figures.
+    private class ImageCache {
+        // Size of cached images.
+        public int cachedImagesSize = 0;
+        public Map<String, Image> cache = new HashMap<>();
+    }
+
     private final Controller controller;
     private final Map<String, Image> images;
     private ArrayList<Piece> pieces;
@@ -15,6 +23,7 @@ public class ChessBoardPanel extends JPanel {
     private Color turn = null;
     private Piece selectedPiece = null;
     private Point selectedPiecePosition = null;
+    private final ImageCache imageCache = new ImageCache();
 
     public ChessBoardPanel(Controller controller, ArrayList<Piece> pieces, Map<String, Image> images) {
         this.controller = controller;
@@ -24,7 +33,6 @@ public class ChessBoardPanel extends JPanel {
     }
 
     @Override public void paint(Graphics g) {
-        // TODO: repaint only changed area.
         Dimension dimension = this.getSize();
         int width = dimension.width / 8;
         int height = dimension.height / 8;
@@ -48,10 +56,27 @@ public class ChessBoardPanel extends JPanel {
             if (playerColor.equals(Color.WHITE)) {
                 y = dimension.height - y - height;
             }
-            // TODO: cache scaled images.
-            g.drawImage(images.get(p.imageName).getScaledInstance(width, height,
-                                                                  Image.SCALE_SMOOTH),
-                        x, y, this);
+            // Use image from cache if we can.
+            Image image;
+            if (imageCache.cachedImagesSize == width) {
+                // Try to get cached image.
+                image = imageCache.cache.get(p.imageName);
+                // Cache contains images of the right size, but doesn't have image
+                // for figure that we need.
+                if (image == null) {
+                    image = images.get(p.imageName).getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                    imageCache.cache.put(p.imageName, image);
+                }
+            }
+            else {
+                // Clear cache and set new cached images size (probably, window was
+                // resized).
+                image = images.get(p.imageName).getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                imageCache.cache = new HashMap<>();
+                imageCache.cache.put(p.imageName, image);
+                imageCache.cachedImagesSize = width;
+            }
+            g.drawImage(image, x, y, this);
         }
         if (selectedPiece != null && selectedPiece.color == playerColor) {
             for (Object moveObj : possibleMoves.stream()
