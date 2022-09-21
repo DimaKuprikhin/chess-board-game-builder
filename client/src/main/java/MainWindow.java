@@ -19,7 +19,7 @@ public class MainWindow {
     public static void main(String[] args) {
         Runnable r = () -> {
             boolean useLocalServer = args.length > 0 && args[0].equals(
-                    "use-local-server");
+                    "--use-local-server");
             MainWindow cg = new MainWindow(new Controller(useLocalServer));
         };
         // Swing GUIs should be created and updated on the EDT

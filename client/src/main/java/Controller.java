@@ -15,6 +15,7 @@ public class Controller {
 
     public Controller(boolean useLocalServer) {
         if (useLocalServer) {
+            System.out.println("Use local server on port 5000");
             this.httpManager = new HttpManager("http", "localhost", 5000);
         }
         else {
