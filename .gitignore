@@ -46,3 +46,7 @@ out/
 *.iml
 *.ipr
 *.iws
+
+## Private files
+todo.txt
+Makefile_private
