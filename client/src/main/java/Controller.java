@@ -1,13 +1,12 @@
 import org.json.simple.JSONObject;
 
 import java.awt.*;
-import java.io.File;
-import java.net.http.HttpClient;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
+
     private ChessBoardPanel boardPanel;
     private HttpManager httpManager;
     private Long gameId = null;
@@ -47,6 +46,24 @@ public class Controller {
     private void cancelTimer() {
         timer.cancel();
         timer = null;
+    }
+
+    private boolean handleGameEnding(GameState gameState) {
+        String message = null;
+        if (gameState.status.equals("draw")) {
+            message = "Ничья!";
+        }
+        if (gameState.status.equals("white won")) {
+            message = "Белые победили!";
+        }
+        if (gameState.status.equals("black won")) {
+            message = "Черные победили!";
+        }
+        if (message != null) {
+            Utils.showInfo("Игра закончена", message);
+            return true;
+        }
+        return false;
     }
 
     public void createGame(String script, String playAs) {
@@ -102,6 +119,12 @@ public class Controller {
         GameState gameState = GameState.fromJSON((JSONObject) result.get("game_state"));
         Color color = Utils.fromString((String) result.get("color"));
         Color turn = Utils.fromString((String) result.get("turn"));
+        if (handleGameEnding(gameState)) {
+            cancelTimer();
+            boardPanel.updateBoard(
+                    new GameState(gameState.pieces, new ArrayList<>(), gameState.status), color, turn);
+            return;
+        }
         boardPanel.updateBoard(gameState, color, turn);
         if (!gameState.status.equals("not started")) {
             if (linkWindow != null) {
@@ -129,6 +152,11 @@ public class Controller {
         GameState gameState = GameState.fromJSON((JSONObject) result.get("game_state"));
         Color color = Utils.fromString((String) result.get("color"));
         Color turn = Utils.fromString((String) result.get("turn"));
+        if (handleGameEnding(gameState)) {
+            boardPanel.updateBoard(
+                    new GameState(gameState.pieces, new ArrayList<>(), gameState.status), color, turn);
+            return;
+        }
         boardPanel.updateBoard(gameState, color, turn);
         scheduleUpdateGameState();
     }
