@@ -36,3 +36,24 @@ internal_test_flask:
 	@pytest -v
 
 test: internal_test_server_backend internal_test_flask clean
+
+build_flask:
+	python3 setup.py bdist_wheel
+
+move_flask:
+	scp ./dist/flaskr-1.0.0-py3-none-any.whl 51.250.76.192:/home/dima/server/flaskr-1.0.0-py3-none-any.whl
+
+install_ONLY_ON_SERVER:
+	ssh dima@51.250.76.192
+	cd server
+	virtualenv venv
+	source venv/bin/activate
+	mkdir script
+	pip install Flask
+	pip install flaskr-1.0.0-py3-none-any.whl
+	pip install typing_extensions
+	flask --app flaskr init-db
+	pip install waitress
+	waitress-serve --call 'flaskr:create_app'
+	sudo kill -9 `sudo lsof -t -i:8080`
+	waitress-serve --call 'flaskr:create_app'
