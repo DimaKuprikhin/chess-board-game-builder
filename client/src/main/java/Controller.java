@@ -50,7 +50,9 @@ public class Controller {
         if (timer == null) {
             timer = new Timer();
         }
-        long TIMER_TASK_DELAY = 2000;
+        // Time spent on getting current game state from remote server is between
+        // 50 and 300 milliseconds, so timer delay 1000 ms should be enough.
+        long TIMER_TASK_DELAY = 1000;
         timer.schedule(new TimerTask() {
             @Override public void run() {
                 updateGameState();
@@ -142,7 +144,8 @@ public class Controller {
     }
 
     private void updateGameState() {
-        // Send request for actual game state.
+        // TODO: optimize this method so we can decrease timer delay (and lag between players).
+        // Send request for current game state.
         JSONObject response = httpManager.getGameState(gameId);
         if (!checkResponseStatus(response)) {
             return;
