@@ -53,7 +53,7 @@ public class ChessBoardPanel extends JPanel {
                                                                   Image.SCALE_SMOOTH),
                         x, y, this);
         }
-        if (selectedPiece != null) {
+        if (selectedPiece != null && selectedPiece.color == playerColor) {
             for (Object moveObj : possibleMoves.stream()
                                                .filter(m -> m.from.x == selectedPiece.getX()
                                                        && m.from.y == selectedPiece.getY())
