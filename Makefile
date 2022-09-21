@@ -24,7 +24,10 @@ format:
 
 init:
 	@flask --app flaskr init-db
-	@rm -rf ./scripts/*
+	@rm -rf ./scripts
+	@mkdir ./scripts
+	@rm -rf ./server_backend/test_data/${TEST_SCRIPTS_DIR}
+	@mkdir ./server_backend/test_data/${TEST_SCRIPTS_DIR}
 
 run:
 	@flask --app flaskr --debug run
