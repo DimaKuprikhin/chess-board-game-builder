@@ -1,7 +1,7 @@
 import json
 import pathlib
 from flask import Blueprint, request, current_app
-from flaskr import db, utils
+from flaskr import db
 from server_backend.controller.controller import Controller
 
 join_by_link_bp = Blueprint(

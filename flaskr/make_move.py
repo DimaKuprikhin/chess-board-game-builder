@@ -1,7 +1,7 @@
 import json
 import pathlib
 from flask import Blueprint, request, current_app
-from flaskr import db, utils
+from flaskr import db
 from server_backend.controller.controller import Controller
 
 make_move_bp = Blueprint('make_move', __name__, url_prefix='/make_move')
