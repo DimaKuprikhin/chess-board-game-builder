@@ -4,7 +4,7 @@ from werkzeug.test import Client
 from flask import Flask
 
 
-def test_register(client: Client, app: Flask):
+def test_create_game(client: Client, app: Flask):
   response = client.post(
       '/load_script/', json={
           'script': 'print(2)',

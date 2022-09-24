@@ -4,7 +4,7 @@ from werkzeug.test import Client
 from flask import Flask
 
 
-def test_register(client: Client, app: Flask):
+def test_make_move(client: Client, app: Flask):
   script = open('./server_backend/test_data/chess_rules.py').read()
   response = client.post(
       '/load_script/', json={
