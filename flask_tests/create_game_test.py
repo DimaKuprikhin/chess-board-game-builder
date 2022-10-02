@@ -7,7 +7,7 @@ from flask import Flask
 def test_create_game(client: Client, app: Flask):
   response = client.post(
       '/load_script/', json={
-          'script': 'print(2)',
+          'script': 'return 2',
           'user_id': 1
       }
   )
