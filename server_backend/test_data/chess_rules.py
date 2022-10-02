@@ -1,5 +1,28 @@
-from copy import deepcopy
+def deepcopy_piece(piece):
+  if piece is None:
+    return None
+  return {'name': piece['name'], 'color': piece['color'], 'x': piece['x'], 'y': piece['y']}
 
+def deepcopy_pieces(pieces):
+  result = []
+  for piece in pieces:
+    result.append(deepcopy_piece(piece))
+  return result
+
+def deepcopy_move(move):
+  return {'from_x': move['from_x'], 'from_y': move['from_y'], 'to_x': move['to_x'], 'to_y': move['to_y']}
+
+def deepcopy_moves(moves):
+  result = []
+  for move in moves:
+    result.append(deepcopy_move(move))
+  return result
+
+def deepcopy_additional_data(data):
+  result = {}
+  for key in data:
+    result[key] = data[key]
+  return result
 
 def do_get_possible_moves(pieces, turn, additional_data):
   possible_moves = []
@@ -169,9 +192,9 @@ def do_get_possible_moves(pieces, turn, additional_data):
 def filter_possible_moves(pieces, turn, additional_data, moves):
   king = [p for p in pieces if p['color'] == turn and p['name'] == 'king']
   if len(king) == 0:
-    return deepcopy(moves)
-  king = deepcopy(king[0])
-  king_backup = deepcopy(king)
+    return deepcopy_moves(moves)
+  king = deepcopy_piece(king[0])
+  king_backup = deepcopy_piece(king)
   moves_ = []
   for move in moves:
     is_castling = king['x'] == move['from_x'] and king['y'] == move['from_y'] and abs(move['from_x'] - move['to_x']) == 2
@@ -196,7 +219,7 @@ def filter_possible_moves(pieces, turn, additional_data, moves):
         break
     if valid:
       moves_.append(move)
-    king = deepcopy(king_backup)
+    king = deepcopy_piece(king_backup)
   return moves_
 
 def get_possible_moves(pieces, turn, additional_data):
@@ -213,12 +236,12 @@ def do_make_move(pieces, move, additional_data):
   y = move['from_y']
   to_x = move['to_x']
   to_y = move['to_y']
-  pieces_ = deepcopy(pieces)
-  additional_data_ = deepcopy(additional_data)
+  pieces_ = deepcopy_pieces(pieces)
+  additional_data_ = deepcopy_additional_data(additional_data)
   # castling
   if piece_at(x, y)['name'] == 'king' and abs(to_x - x) == 2:
-    king = deepcopy(piece_at(x, y))
-    rook = deepcopy(piece_at(x - 4, y) if to_x < x else piece_at(x + 3, y))
+    king = deepcopy_piece(piece_at(x, y))
+    rook = deepcopy_piece(piece_at(x - 4, y) if to_x < x else piece_at(x + 3, y))
     pieces_.remove(king)
     pieces_.remove(rook)
     king['x'] = to_x
@@ -239,12 +262,12 @@ def do_make_move(pieces, move, additional_data):
         additional_data_['black_h_rook_moved'] = True
   # promotion
   elif piece_at(x, y)['name'] == 'pawn' and to_y == (0 if piece_at(x, y)['color'] == 'black' else 7):
-    pawn = deepcopy(piece_at(x, y))
+    pawn = deepcopy_piece(piece_at(x, y))
     pieces_.remove(pawn)
     pieces_.append({ 'name': 'queen', 'color': pawn['color'], 'x': to_x, 'y': to_y })
   else:
-    captured = deepcopy(piece_at(to_x, to_y))
-    moved = deepcopy(piece_at(x, y))
+    captured = deepcopy_piece(piece_at(to_x, to_y))
+    moved = deepcopy_piece(piece_at(x, y))
     if captured is not None:
       pieces_.remove(captured)
     pieces_.remove(moved)
